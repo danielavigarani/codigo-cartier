@@ -61,3 +61,36 @@ h1, h2, h3, .cartier-font {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* Modo Sigilo para Stream/Compartilhamento */
+.secret-mode {
+    filter: blur(5px);
+    transition: filter 0.3s ease;
+    cursor: text;
+}
+
+.secret-mode:focus {
+    /* Opcional: Se quiser que desembaçe levemente quando você clica, senão apague essa linha */
+    filter: blur(4px); 
+}
+
+/* --- CSS NOVO PARA O MODO SIGILO --- */
+
+/* Oculta as letras da tradução (as "colas") quando o modo secreto está ativo */
+.secret-output .decrypted-hint {
+    filter: blur(8px);
+    opacity: 0.3;
+    user-select: none; /* Impede que selecionem o texto borrado */
+}
+
+/* Mantém as notas (C4, A2) visíveis, mas esconde a letra do alfabeto */
+.secret-mode {
+    filter: blur(5px);
+    transition: filter 0.3s ease;
+}
+/* Isso garante que a 'Cola' suma quando o Modo Sigilo está ligado */
+.secret-output .decrypted-hint {
+    opacity: 0 !important; /* Forcei com !important para garantir */
+    filter: blur(8px);
+    transition: all 0.3s ease;
+}

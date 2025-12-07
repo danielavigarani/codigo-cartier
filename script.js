@@ -1,10 +1,5 @@
 // --- CONFIGURAÇÃO E DADOS ---
-
-// MUDANÇA PRINCIPAL: Escala de Lá Menor (A Minor)
-// Apenas notas naturais (teclas brancas). Impossível soar desafinado.
 const NOTES = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
-
-// Começamos na Oitava 2 para ter graves profundos no Cello
 const START_OCTAVE = 2; 
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
@@ -18,111 +13,113 @@ let currentOctave = START_OCTAVE;
 alphabet.forEach(letter => {
     const noteName = NOTES[currentNoteIndex];
     const fullNote = `${noteName}${currentOctave}`;
-    
     codeMap[letter] = fullNote;
     reverseMap[fullNote] = letter;
-
     currentNoteIndex++;
-    // Se acabou as 7 notas da escala, sobe uma oitava
     if (currentNoteIndex >= NOTES.length) {
         currentNoteIndex = 0;
         currentOctave++;
     }
 });
 
-// --- SISTEMA DE ÁUDIO (TONE.JS COM SAMPLER) ---
+// --- SISTEMA DE ÁUDIO ---
 let pianoSampler;
 let celloSampler;
 let currentSynth; 
 let isAudioInit = false;
 let currentInstrument = 'piano';
+let isPlaying = false; // Controle de estado (Tocando ou Parado)
 
 async function initAudio() {
     if (isAudioInit) return;
     await Tone.start();
     
-    // Reverb mais longo para dar clima de "Catedral/Mistério"
-    const reverb = new Tone.Reverb({
-        decay: 4, 
-        wet: 0.5
-    }).toDestination();
+    const reverb = new Tone.Reverb({ decay: 4, wet: 0.5 }).toDestination();
 
-    // 1. PIANO (Salamander)
     pianoSampler = new Tone.Sampler({
         urls: {
-            "A2": "A2.mp3",
-            "C3": "C3.mp3",
-            "D#3": "Ds3.mp3",
-            "F#3": "Fs3.mp3",
-            "A3": "A3.mp3",
-            "C4": "C4.mp3",
-            "D#4": "Ds4.mp3",
-            "F#4": "Fs4.mp3",
-            "A4": "A4.mp3",
-            "C5": "C5.mp3",
-            "A5": "A5.mp3"
+            "A2": "A2.mp3", "C3": "C3.mp3", "D#3": "Ds3.mp3", "F#3": "Fs3.mp3",
+            "A3": "A3.mp3", "C4": "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3",
+            "A4": "A4.mp3", "C5": "C5.mp3", "A5": "A5.mp3"
         },
         release: 1,
         baseUrl: "https://tonejs.github.io/audio/salamander/",
-        onload: () => { console.log("Piano Carregado!"); }
     }).connect(reverb);
 
-    // 2. VIOLONCELO (Sons reais)
     celloSampler = new Tone.Sampler({
         urls: {
-            "A2": "A2.mp3",
-            "C3": "C3.mp3",
-            "E3": "E3.mp3",
-            "A3": "A3.mp3",
-            "C4": "C4.mp3",
-            "E4": "E4.mp3",
-            "A4": "A4.mp3"
+            "A2": "A2.mp3", "C3": "C3.mp3", "E3": "E3.mp3", "A3": "A3.mp3",
+            "C4": "C4.mp3", "E4": "E4.mp3", "A4": "A4.mp3"
         },
         release: 2, 
         baseUrl: "https://raw.githubusercontent.com/nbrosowsky/tonejs-instruments/master/samples/cello/",
-        onload: () => { console.log("Cello Carregado!"); }
     }).connect(reverb);
 
     currentSynth = pianoSampler;
     isAudioInit = true;
 
     document.getElementById('audio-overlay').classList.add('hidden');
-    const controls = document.getElementById('audio-controls');
-    controls.classList.remove('hidden');
-    controls.classList.add('flex');
+    document.getElementById('audio-controls').classList.remove('hidden');
+    document.getElementById('audio-controls').classList.add('flex');
+}
+
+function stopSequence() {
+    // Para o transporte, limpa os eventos e reseta o botão
+    Tone.Transport.stop();
+    Tone.Transport.cancel(); // Remove notas agendadas
+    isPlaying = false;
+    updatePlayButtonUI();
 }
 
 function setInstrument(inst) {
+    // 1. PARA A MÚSICA SE ESTIVER TOCANDO (Evita atropelamento)
+    if (isPlaying) stopSequence();
+
     currentInstrument = inst;
     const btnPiano = document.getElementById('btn-piano');
     const btnCello = document.getElementById('btn-cello');
     
+    // Classes de Estilo Ativo vs Inativo
+    const activeClasses = ['bg-amber-600', 'text-white', 'shadow-md'];
+    const inactiveClasses = ['bg-transparent', 'text-slate-400'];
+
     if(inst === 'piano') {
         currentSynth = pianoSampler;
-        btnPiano.classList.remove('text-slate-400', 'hover:text-white', 'bg-transparent');
-        btnPiano.classList.add('bg-amber-600', 'text-white');
-        btnCello.classList.add('text-slate-400', 'hover:text-white');
-        btnCello.classList.remove('bg-amber-600', 'text-white');
+        
+        // Ativa Piano
+        btnPiano.classList.add(...activeClasses);
+        btnPiano.classList.remove(...inactiveClasses);
+        
+        // Desativa Cello
+        btnCello.classList.add(...inactiveClasses);
+        btnCello.classList.remove(...activeClasses);
     } else {
         currentSynth = celloSampler;
-        btnCello.classList.remove('text-slate-400', 'hover:text-white', 'bg-transparent');
-        btnCello.classList.add('bg-amber-600', 'text-white');
-        btnPiano.classList.add('text-slate-400', 'hover:text-white');
-        btnPiano.classList.remove('bg-amber-600', 'text-white');
+        
+        // Ativa Cello
+        btnCello.classList.add(...activeClasses);
+        btnCello.classList.remove(...inactiveClasses);
+        
+        // Desativa Piano
+        btnPiano.classList.add(...inactiveClasses);
+        btnPiano.classList.remove(...activeClasses);
     }
 }
 
 function playNote(note) {
     if (!isAudioInit || !currentSynth) return;
     try {
-        // Humanização leve no volume (Velocity)
         const vel = 0.6 + (Math.random() * 0.4);
-        currentSynth.triggerAttackRelease(note, currentInstrument === 'cello' ? "1n" : "2n", Tone.now(), vel);
+        const dur = currentInstrument === 'cello' ? "2n" : "2n"; 
+        currentSynth.triggerAttackRelease(note, dur, Tone.now(), vel);
     } catch(e) { console.error(e); }
 }
 
-// --- FUNÇÕES DA INTERFACE (UI) ---
+// --- INTERFACE ---
 function switchTab(tab) {
+    // 2. PARA A MÚSICA AO TROCAR DE ABA
+    if (isPlaying) stopSequence();
+
     ['encrypt', 'decrypt', 'legend'].forEach(t => {
         document.getElementById(`panel-${t}`).classList.add('hidden');
         const btn = document.getElementById(`tab-${t}`);
@@ -136,12 +133,12 @@ function switchTab(tab) {
     activeBtn.classList.add('border-amber-500', 'text-amber-500', 'font-bold');
 }
 
-// --- LÓGICA DE CIFRAGEM (ENCRYPT) ---
+// --- CIFRAGEM E PLAYBACK ---
 let currentSequence = [];
 
 function encryptText() {
-    let input = document.getElementById('input-text').value.toUpperCase();
-    input = input.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    let rawInput = document.getElementById('input-text').value;
+    let input = rawInput.replace(/[\n\t]/g, ' ').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
 
     const outputDiv = document.getElementById('encrypt-output');
     const container = document.getElementById('encrypt-result-container');
@@ -150,7 +147,9 @@ function encryptText() {
     currentSequence = []; 
     container.classList.remove('hidden');
 
+    // Se usuário apagar o texto enquanto toca, para a música
     if (!input.trim()) {
+        if(isPlaying) stopSequence();
         outputDiv.innerHTML = '<span class="text-slate-500 w-full text-center">Digite algo para cifrar...</span>';
         return;
     }
@@ -162,7 +161,6 @@ function encryptText() {
             
             const span = document.createElement('div');
             span.className = "flex flex-col items-center mx-1 group cursor-pointer p-2 rounded hover:bg-slate-800 transition-all";
-            span.title = "Clique para ouvir";
             span.onclick = () => playNote(note);
             
             const noteText = document.createElement('span');
@@ -170,120 +168,141 @@ function encryptText() {
             noteText.innerText = note;
 
             const letterText = document.createElement('span');
-            letterText.className = "text-[10px] text-slate-500 mt-1 uppercase font-bold";
+            letterText.className = "decrypted-hint text-[10px] text-slate-500 mt-1 uppercase font-bold transition-all";
             letterText.innerText = char;
 
             span.appendChild(noteText);
             span.appendChild(letterText);
+            outputDiv.appendChild(span);
             
-            // Barra simples
+            // Barra separadora
             const bar = document.createElement('span');
             bar.className = "text-slate-700 mx-0 select-none font-thin text-2xl opacity-30";
             bar.innerText = "|";
-
-            outputDiv.appendChild(span);
             outputDiv.appendChild(bar);
+
         } else if (char === ' ') {
             const space = document.createElement('div');
-            space.className = "w-6 h-1 bg-slate-700 mx-2 self-center rounded opacity-30";
+            space.className = "w-10 h-1 bg-slate-600 mx-2 self-center rounded opacity-50"; 
             outputDiv.appendChild(space);
             currentSequence.push(null); 
         }
     }
 }
 
-async function playSequence() {
-    if (!isAudioInit || !currentSynth) {
-        alert("Por favor, ative o áudio no botão e aguarde o carregamento.");
+// 3. NOVA FUNÇÃO DE CONTROLE (PLAY / PAUSE / STOP)
+function togglePlay() {
+    if (!isAudioInit) {
+        alert("Ative o áudio primeiro!");
         return;
     }
+    
+    if (isPlaying) {
+        // Se já está tocando, PARA TUDO.
+        stopSequence();
+    } else {
+        // Se está parado, INICIA.
+        playSequence();
+    }
+}
+
+function updatePlayButtonUI() {
+    const icon = document.getElementById('icon-play');
+    const text = document.getElementById('text-play');
+    const btn = document.getElementById('btn-play-action'); // ID novo no HTML
+
+    if (isPlaying) {
+        icon.innerText = "stop_circle"; // Ícone de Parar
+        text.innerText = "Parar Sequência";
+        btn.classList.add('bg-red-900/50', 'border-red-500'); // Estilo vermelho
+        btn.classList.remove('bg-slate-900', 'border-amber-900');
+    } else {
+        icon.innerText = "play_circle"; // Ícone de Play
+        text.innerText = "Tocar Sequência";
+        btn.classList.remove('bg-red-900/50', 'border-red-500');
+        btn.classList.add('bg-slate-900', 'border-amber-900');
+    }
+}
+
+function playSequence() {
     if (currentSequence.length === 0) return;
 
-    const now = Tone.now();
-    let timeOffset = 0;
-    
-    // Ritmo mais lento e cadenciado para soar como música
-    const step = currentInstrument === 'cello' ? 0.8 : 0.5; 
-    const duration = currentInstrument === 'cello' ? "2n" : "4n";
+    // Garante que está limpo antes de começar
+    Tone.Transport.stop();
+    Tone.Transport.cancel();
 
+    const step = currentInstrument === 'cello' ? 0.8 : 0.25; 
+    const duration = currentInstrument === 'cello' ? "2n" : "8n";
+    let currentTime = 0;
+
+    // Agendar as notas na linha do tempo do Transporte
     currentSequence.forEach((note) => {
         if (note) {
-            // HUMANIZAÇÃO: Pequenas imperfeições de tempo e força
-            const humanize = (Math.random() * 0.05);
-            const velocity = 0.6 + (Math.random() * 0.4);
-
-            currentSynth.triggerAttackRelease(note, duration, now + timeOffset + humanize, velocity);
+            Tone.Transport.schedule((time) => {
+                const vel = 0.6 + (Math.random() * 0.4);
+                currentSynth.triggerAttackRelease(note, duration, time, vel);
+            }, currentTime);
+            currentTime += step;
+        } else {
+            // Pausa (Espaço)
+            currentTime += (step * 2.0);
         }
-        timeOffset += step;
     });
+
+    // Agenda o fim da música para resetar o botão
+    Tone.Transport.schedule(() => {
+        stopSequence();
+    }, currentTime + 1); // +1 segundo de margem
+
+    // Inicia
+    isPlaying = true;
+    updatePlayButtonUI();
+    Tone.Transport.start();
 }
 
 function clearEncrypt() {
+    if(isPlaying) stopSequence(); // Para música ao limpar
     document.getElementById('input-text').value = '';
     document.getElementById('encrypt-output').innerHTML = '';
     document.getElementById('encrypt-result-container').classList.add('hidden');
     currentSequence = [];
 }
 
-// --- LÓGICA DE DECIFRAGEM / TECLADO (ATUALIZADA) ---
+// --- TECLADO E UTILITÁRIOS ---
 function generateKeyboard() {
     const container = document.getElementById('piano-container');
     container.innerHTML = '';
-    
     const orderedNotes = Object.values(codeMap); 
     
     orderedNotes.forEach(note => {
-        // Agora todas são teclas "Brancas" (Naturais)
         const letter = reverseMap[note];
-        
         const btn = document.createElement('button');
+        btn.className = "note-key flex-shrink-0 flex flex-col justify-center items-center m-1 rounded-md shadow-lg border-b-4 focus:outline-none white-key-style w-14 h-32";
         
-        // Estilo unificado (apenas teclas brancas elegantes)
-        let cssClasses = "note-key flex-shrink-0 flex flex-col justify-center items-center m-1 rounded-md shadow-lg border-b-4 focus:outline-none white-key-style w-14 h-32";
-        
-        btn.className = cssClasses;
-        
-        const noteLabel = document.createElement('span');
-        noteLabel.innerText = note;
-        noteLabel.className = "font-bold text-lg mb-2 z-10 text-slate-800"; // Texto escuro para contraste
-        
-        const hintLabel = document.createElement('span');
-        hintLabel.innerText = letter;
-        hintLabel.className = "hint-text text-sm font-bold text-amber-600 opacity-60 font-mono border-t border-slate-300 pt-2 w-full text-center transition-opacity";
-        
-        btn.appendChild(noteLabel);
-        btn.appendChild(hintLabel);
+        btn.innerHTML = `
+            <span class="font-bold text-lg mb-2 z-10 text-slate-800">${note}</span>
+            <span class="hint-text text-sm font-bold text-amber-600 opacity-60 font-mono border-t border-slate-300 pt-2 w-full text-center transition-opacity">${letter}</span>
+        `;
 
         btn.onclick = () => {
             playNote(note);
             const output = document.getElementById('decrypt-output');
             output.value += letter;
             
-            // Efeito visual
-            btn.style.backgroundColor = "#d97706"; // Amber
+            btn.style.backgroundColor = "#d97706"; 
             btn.style.color = "white";
             setTimeout(() => {
-                btn.style.backgroundColor = "#e2e8f0"; // Volta pro branco
+                btn.style.backgroundColor = "#e2e8f0"; 
                 btn.style.color = "#0f172a";
             }, 200);
         };
-
         container.appendChild(btn);
-    });
-}
-
-function toggleHints() {
-    const show = document.getElementById('show-hints').checked;
-    const hints = document.querySelectorAll('.hint-text');
-    hints.forEach(h => {
-        h.style.opacity = show ? '1' : '0';
     });
 }
 
 function populateReferenceTable() {
     const table = document.getElementById('reference-table');
-    table.innerHTML = ''; // Limpa antes de preencher
-    
+    table.innerHTML = ''; 
     alphabet.forEach(letter => {
         const div = document.createElement('div');
         div.className = "bg-slate-700/30 p-2 rounded flex flex-col items-center border border-slate-600 hover:bg-slate-700 transition-colors";
@@ -293,6 +312,51 @@ function populateReferenceTable() {
         `;
         table.appendChild(div);
     });
+}
+
+function toggleSecretMode() {
+    const input = document.getElementById('input-text');
+    const outputContainer = document.getElementById('encrypt-output');
+    const icon = document.getElementById('icon-secret');
+    const text = document.getElementById('text-secret');
+    
+    input.classList.toggle('secret-mode');
+    outputContainer.classList.toggle('secret-output');
+    
+    if (input.classList.contains('secret-mode')) {
+        icon.innerText = 'visibility_off';
+        text.innerText = 'Modo Sigilo (Ativo)';
+        text.classList.remove('text-slate-500');
+        text.classList.add('text-amber-500');    
+    } else {
+        icon.innerText = 'visibility';
+        text.innerText = 'Modo Público';
+        text.classList.add('text-slate-500');
+        text.classList.remove('text-amber-500');
+    }
+}
+
+let areHintsVisible = true;
+function toggleHints() {
+    areHintsVisible = !areHintsVisible;
+    document.querySelectorAll('.hint-text').forEach(h => {
+        h.style.opacity = areHintsVisible ? '1' : '0';
+    });
+
+    const icon = document.getElementById('icon-hints');
+    const text = document.getElementById('text-hints');
+
+    if (areHintsVisible) {
+        icon.innerText = 'visibility';
+        text.innerText = 'Ocultar "Cola"';
+        icon.classList.replace('text-slate-500', 'text-amber-500');
+        text.classList.replace('text-slate-500', 'text-amber-500');
+    } else {
+        icon.innerText = 'visibility_off';
+        text.innerText = 'Mostrar "Cola"';
+        icon.classList.replace('text-amber-500', 'text-slate-500');
+        text.classList.replace('text-amber-500', 'text-slate-500');
+    }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
