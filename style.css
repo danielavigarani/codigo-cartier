@@ -1,0 +1,63 @@
+/* Estilos Personalizados */
+body {
+    font-family: 'Courier Prime', monospace;
+    background-color: #0f172a; /* Slate 900 */
+    color: #e2e8f0; /* Slate 200 */
+}
+
+h1, h2, h3, .cartier-font {
+    font-family: 'Playfair Display', serif;
+}
+
+.note-key {
+    transition: all 0.1s ease;
+}
+
+.note-key:active {
+    transform: scale(0.95);
+}
+
+/* Estilização específica para teclas */
+.black-key-style {
+    background-color: #1e293b;
+    border-color: #475569;
+    color: #d97706; /* Amber 600 text */
+}
+
+.white-key-style {
+    background-color: #e2e8f0;
+    border-color: #cbd5e1;
+    color: #0f172a; /* Dark text */
+}
+
+.active-note {
+    background-color: #d97706 !important; /* Amber 600 */
+    color: white !important;
+    border-color: #fbbf24 !important;
+    box-shadow: 0 0 15px rgba(217, 119, 6, 0.5);
+}
+
+/* Scrollbar customizada */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1e293b; 
+}
+::-webkit-scrollbar-thumb {
+    background: #475569; 
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #64748b; 
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
