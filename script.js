@@ -28,7 +28,7 @@ let celloSampler;
 let currentSynth; 
 let isAudioInit = false;
 let currentInstrument = 'piano';
-let isPlaying = false; // Controle de estado (Tocando ou Parado)
+let isPlaying = false; // Controle de estado
 
 async function initAudio() {
     if (isAudioInit) return;
@@ -63,46 +63,47 @@ async function initAudio() {
     document.getElementById('audio-controls').classList.add('flex');
 }
 
+// FUNÇÃO MESTRA PARA PARAR TUDO
 function stopSequence() {
-    // Para o transporte, limpa os eventos e reseta o botão
     Tone.Transport.stop();
-    Tone.Transport.cancel(); // Remove notas agendadas
+    Tone.Transport.cancel(); // Limpa as notas agendadas
     isPlaying = false;
     updatePlayButtonUI();
 }
 
 function setInstrument(inst) {
-    // 1. PARA A MÚSICA SE ESTIVER TOCANDO (Evita atropelamento)
+    // Para a música se trocar de instrumento
     if (isPlaying) stopSequence();
 
     currentInstrument = inst;
     const btnPiano = document.getElementById('btn-piano');
     const btnCello = document.getElementById('btn-cello');
     
-    // Classes de Estilo Ativo vs Inativo
-    const activeClasses = ['bg-amber-600', 'text-white', 'shadow-md'];
+    // Classes para manipulação segura (CORREÇÃO APLICADA AQUI)
+    const activeClasses = ['bg-amber-600', 'text-white'];
     const inactiveClasses = ['bg-transparent', 'text-slate-400'];
 
     if(inst === 'piano') {
         currentSynth = pianoSampler;
         
-        // Ativa Piano
-        btnPiano.classList.add(...activeClasses);
-        btnPiano.classList.remove(...inactiveClasses);
+        // Remove inativas e adiciona ativas para o Piano
+        inactiveClasses.forEach(cls => btnPiano.classList.remove(cls));
+        activeClasses.forEach(cls => btnPiano.classList.add(cls));
         
-        // Desativa Cello
-        btnCello.classList.add(...inactiveClasses);
-        btnCello.classList.remove(...activeClasses);
+        // Remove ativas e adiciona inativas para o Cello
+        activeClasses.forEach(cls => btnCello.classList.remove(cls));
+        inactiveClasses.forEach(cls => btnCello.classList.add(cls));
+        
     } else {
         currentSynth = celloSampler;
         
-        // Ativa Cello
-        btnCello.classList.add(...activeClasses);
-        btnCello.classList.remove(...inactiveClasses);
+        // Remove inativas e adiciona ativas para o Cello
+        inactiveClasses.forEach(cls => btnCello.classList.remove(cls));
+        activeClasses.forEach(cls => btnCello.classList.add(cls));
         
-        // Desativa Piano
-        btnPiano.classList.add(...inactiveClasses);
-        btnPiano.classList.remove(...activeClasses);
+        // Remove ativas e adiciona inativas para o Piano
+        activeClasses.forEach(cls => btnPiano.classList.remove(cls));
+        inactiveClasses.forEach(cls => btnPiano.classList.add(cls));
     }
 }
 
@@ -117,7 +118,7 @@ function playNote(note) {
 
 // --- INTERFACE ---
 function switchTab(tab) {
-    // 2. PARA A MÚSICA AO TROCAR DE ABA
+    // Para a música se trocar de aba
     if (isPlaying) stopSequence();
 
     ['encrypt', 'decrypt', 'legend'].forEach(t => {
@@ -147,7 +148,6 @@ function encryptText() {
     currentSequence = []; 
     container.classList.remove('hidden');
 
-    // Se usuário apagar o texto enquanto toca, para a música
     if (!input.trim()) {
         if(isPlaying) stopSequence();
         outputDiv.innerHTML = '<span class="text-slate-500 w-full text-center">Digite algo para cifrar...</span>';
@@ -175,7 +175,6 @@ function encryptText() {
             span.appendChild(letterText);
             outputDiv.appendChild(span);
             
-            // Barra separadora
             const bar = document.createElement('span');
             bar.className = "text-slate-700 mx-0 select-none font-thin text-2xl opacity-30";
             bar.innerText = "|";
@@ -190,7 +189,7 @@ function encryptText() {
     }
 }
 
-// 3. NOVA FUNÇÃO DE CONTROLE (PLAY / PAUSE / STOP)
+// --- LÓGICA PLAY/PAUSE ---
 function togglePlay() {
     if (!isAudioInit) {
         alert("Ative o áudio primeiro!");
@@ -198,26 +197,24 @@ function togglePlay() {
     }
     
     if (isPlaying) {
-        // Se já está tocando, PARA TUDO.
-        stopSequence();
+        stopSequence(); // Se está tocando, PARA.
     } else {
-        // Se está parado, INICIA.
-        playSequence();
+        playSequence(); // Se está parado, TOCA.
     }
 }
 
 function updatePlayButtonUI() {
     const icon = document.getElementById('icon-play');
     const text = document.getElementById('text-play');
-    const btn = document.getElementById('btn-play-action'); // ID novo no HTML
+    const btn = document.getElementById('btn-play-action');
 
     if (isPlaying) {
-        icon.innerText = "stop_circle"; // Ícone de Parar
+        icon.innerText = "stop_circle";
         text.innerText = "Parar Sequência";
-        btn.classList.add('bg-red-900/50', 'border-red-500'); // Estilo vermelho
+        btn.classList.add('bg-red-900/50', 'border-red-500');
         btn.classList.remove('bg-slate-900', 'border-amber-900');
     } else {
-        icon.innerText = "play_circle"; // Ícone de Play
+        icon.innerText = "play_circle";
         text.innerText = "Tocar Sequência";
         btn.classList.remove('bg-red-900/50', 'border-red-500');
         btn.classList.add('bg-slate-900', 'border-amber-900');
@@ -227,15 +224,14 @@ function updatePlayButtonUI() {
 function playSequence() {
     if (currentSequence.length === 0) return;
 
-    // Garante que está limpo antes de começar
-    Tone.Transport.stop();
-    Tone.Transport.cancel();
+    // Reseta antes de começar
+    stopSequence();
 
     const step = currentInstrument === 'cello' ? 0.8 : 0.25; 
     const duration = currentInstrument === 'cello' ? "2n" : "8n";
     let currentTime = 0;
 
-    // Agendar as notas na linha do tempo do Transporte
+    // Agenda as notas na linha do tempo
     currentSequence.forEach((note) => {
         if (note) {
             Tone.Transport.schedule((time) => {
@@ -244,24 +240,22 @@ function playSequence() {
             }, currentTime);
             currentTime += step;
         } else {
-            // Pausa (Espaço)
-            currentTime += (step * 2.0);
+            currentTime += (step * 2.0); // Pausa
         }
     });
 
-    // Agenda o fim da música para resetar o botão
+    // Agenda o fim para resetar o botão automaticamente
     Tone.Transport.schedule(() => {
         stopSequence();
-    }, currentTime + 1); // +1 segundo de margem
+    }, currentTime + 0.5);
 
-    // Inicia
     isPlaying = true;
     updatePlayButtonUI();
     Tone.Transport.start();
 }
 
 function clearEncrypt() {
-    if(isPlaying) stopSequence(); // Para música ao limpar
+    if(isPlaying) stopSequence();
     document.getElementById('input-text').value = '';
     document.getElementById('encrypt-output').innerHTML = '';
     document.getElementById('encrypt-result-container').classList.add('hidden');
@@ -349,13 +343,17 @@ function toggleHints() {
     if (areHintsVisible) {
         icon.innerText = 'visibility';
         text.innerText = 'Ocultar "Cola"';
-        icon.classList.replace('text-slate-500', 'text-amber-500');
-        text.classList.replace('text-slate-500', 'text-amber-500');
+        icon.classList.remove('text-slate-500');
+        icon.classList.add('text-amber-500');
+        text.classList.remove('text-slate-500');
+        text.classList.add('text-amber-500');
     } else {
         icon.innerText = 'visibility_off';
         text.innerText = 'Mostrar "Cola"';
-        icon.classList.replace('text-amber-500', 'text-slate-500');
-        text.classList.replace('text-amber-500', 'text-slate-500');
+        icon.classList.remove('text-amber-500');
+        icon.classList.add('text-slate-500');
+        text.classList.remove('text-amber-500');
+        text.classList.add('text-slate-500');
     }
 }
 
