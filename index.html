@@ -145,7 +145,7 @@
           onclick="switchTab('decrypt')"
         >
           <span class="material-symbols-outlined mr-2 text-sm">lock_open</span>
-          Decifrar (Ler)
+          Decifrar (Revelar)
         </button>
         <button
           class="px-4 md:px-6 py-3 border-b-2 hover:text-amber-500 hover:border-amber-500/50 transition-colors flex items-center border-transparent text-slate-400"
@@ -269,20 +269,46 @@
         <div
           class="bg-slate-800/80 backdrop-blur-md rounded-xl p-6 border border-slate-700 shadow-2xl"
         >
-          <div class="mb-6 relative">
+          <!-- NOVO TEXTAREA E BOTÃO -->
+          <div class="mb-6">
+            <label
+              for="decrypt-input"
+              class="block text-amber-500 text-sm font-bold uppercase tracking-wider mb-2"
+              >Cole o código aqui</label
+            >
+            <textarea
+              id="decrypt-input"
+              class="w-full bg-slate-900/50 text-white border border-slate-600 rounded-lg p-4 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all font-mono text-lg uppercase shadow-inner custom-placeholder"
+              placeholder="Ex: C4 G3 | A3..."
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="flex justify-center mb-8">
+            <button
+                class="bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center"
+                onclick="revealCode()"
+            >
+                <span class="material-symbols-outlined mr-2">hearing</span>
+                Ouvir & Revelar
+            </button>
+          </div>
+          
+          <!-- SEÇÃO DE RESULTADO -->
+          <div class="mb-6 relative pt-6 border-t border-slate-700">
             <div class="flex justify-between items-center mb-2">
               <label
                 class="block text-amber-500 text-sm font-bold uppercase tracking-wider"
-                >Mensagem Decifrada</label
+                >Mensagem Revelada</label
               >
               <button
                 class="text-xs text-slate-400 hover:text-white uppercase flex items-center"
-                onclick="document.getElementById('decrypt-output').value = ''"
+                onclick="document.getElementById('decrypt-output').value = document.getElementById('decrypt-output').value.slice(0, -1);"
               >
                 <span class="material-symbols-outlined text-sm mr-1"
                   >backspace</span
                 >
-                Limpar
+                Apagar Última
               </button>
             </div>
             <input
@@ -293,8 +319,7 @@
               placeholder="..."
             />
             <div class="text-center text-xs text-slate-500 mt-2">
-              Toque nas teclas abaixo conforme ouvir as notas para revelar a
-              letra.
+              As letras aparecerão aqui em sincronia com o áudio.
             </div>
           </div>
 

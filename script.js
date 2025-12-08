@@ -316,6 +316,66 @@ function updatePlayButtonUI() {
   }
 }
 
+function revealCode() {
+  if (!isAudioInit) {
+    alert("Ative o áudio primeiro!");
+    return;
+  }
+  if (isPlaying) {
+    stopSequence();
+    return;
+  }
+
+  const inputText = document.getElementById("decrypt-input").value;
+  const outputElement = document.getElementById("decrypt-output");
+  outputElement.value = "";
+
+  const notes = inputText.trim().toUpperCase().split(/\s+/).filter(n => n.trim() !== '');
+
+  if (notes.length === 0) return;
+  
+  const step = currentInstrument === "cello" ? 0.8 : 0.25;
+  const duration = currentInstrument === "cello" ? "2n" : "8n";
+  let currentTime = 0;
+
+  Tone.Transport.cancel();
+
+  notes.forEach(note => {
+    if (note === '|') {
+        currentTime += step;
+        return;
+    }
+
+    const letter = reverseMap[note];
+    if (letter) {
+      Tone.Transport.schedule(time => {
+        if (!isMuted) {
+          const vel = 0.6 + Math.random() * 0.4;
+          currentSynth.triggerAttackRelease(note, duration, time, vel);
+        }
+      }, currentTime);
+
+      Tone.Transport.schedule(time => {
+        Tone.Draw.schedule(() => {
+          outputElement.value += letter;
+        }, time);
+      }, currentTime);
+      
+      currentTime += step;
+    } else {
+        currentTime += step / 2;
+    }
+  });
+
+  Tone.Transport.schedule(() => {
+    stopSequence();
+  }, currentTime + 0.5);
+
+  isPlaying = true;
+  updatePlayButtonUI();
+  Tone.Transport.start();
+}
+
 function playSequence() {
   if (currentSequence.length === 0) return;
   stopSequence();
@@ -444,6 +504,7 @@ function toggleHints() {
 window.addEventListener("DOMContentLoaded", () => {
   generateKeyboard();
   populateReferenceTable();
+  toggleHints(); // Garante que as dicas começam ocultas
 });
 
 // --- MENU COPIAR (CLIQUE) ---
