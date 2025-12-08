@@ -50,3 +50,41 @@
     - **Efeito Visual:** As letras decifradas aparecem no campo de resultado uma a uma, sincronizadas com o som.
 4.  **Dicas (Cola):** Devem iniciar **OCULTAS** (`false`) por padrão.
 5.  **Edição:** Substituir botão "Limpar" por "Apagar Última" (Backspace).
+
+## 6. Fase 3 (Refinamento): Decifrar V2.1
+
+**Objetivo:** Corrigir a visualização do texto decifrado e melhorar a UX de textos longos.
+
+### Regras de Negócio (Atualizadas):
+
+1.  **Espaços Visuais:** Na função `revealCode`, o caractere `|` (barra) no input cifrado deve ser traduzido explicitamente como um espaço em branco (` `) no campo de resultado.
+    - _Atualmente:_ Ele soma tempo no áudio, mas não adiciona o espaço visualmente.
+2.  **Quebra de Linha Automática:** O campo de resultado (`#decrypt-output`) deve ser um `textarea` ou uma `div` com `flex-wrap`, e não um `input` de linha única, para suportar textos longos sem rolagem horizontal infinita.
+3.  **Separação de Palavras:** O sistema deve identificar visualmente a separação entre palavras decifradas para facilitar a leitura.
+
+### Requisitos Técnicos:
+
+- **HTML:** Trocar `<input id="decrypt-output">` por um `<textarea readonly>` com altura automática ou fixa com scroll.
+- **JS (`revealCode`):** Quando encontrar o token `|`, adicionar `" "` (espaço) ao `value` do output.
+- **CSS:** Garantir que a fonte do resultado seja monoespaçada para manter o alinhamento.
+
+## 7. Fase 3.1: Refinamento do Decifrar (A FAZER AGORA)
+
+**Objetivo:** Suportar textos longos, quebras de linha e cópia fácil na aba de revelação.
+
+### Requisitos Técnicos:
+
+1.  **Textarea no Resultado:**
+
+    - Substituir o `<input id="decrypt-output">` por um `<textarea id="decrypt-output" rows="3">`.
+    - Deve permitir quebra de linha automática (wrap) para textos longos não sumirem na lateral.
+    - Remover barra de rolagem horizontal se houver.
+
+2.  **Espaços Visuais (`revealCode`):**
+
+    - Na função `revealCode`, quando o loop encontrar o caractere `|` (barra), ele deve adicionar um espaço em branco (`" "`) ao valor do textarea, além de agendar a pausa no áudio.
+    - _Atualmente:_ Ele só faz a pausa no áudio e cola as letras juntas.
+
+3.  **Botão Copiar Texto:**
+    - Adicionar um botão "Copiar Texto" ao lado do botão "Apagar Última" na aba Decifrar.
+    - Criar função JS `copyDecryptedText()` que copia o conteúdo do `#decrypt-output`.

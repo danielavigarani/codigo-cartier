@@ -29,7 +29,7 @@ let currentSynth;
 let isAudioInit = false;
 let currentInstrument = "piano";
 let isPlaying = false;
-let isMuted = false; // Estado do Mute
+let isMuted = false;
 
 async function initAudio() {
   if (isAudioInit) return;
@@ -39,17 +39,9 @@ async function initAudio() {
 
   pianoSampler = new Tone.Sampler({
     urls: {
-      A2: "A2.mp3",
-      C3: "C3.mp3",
-      "D#3": "Ds3.mp3",
-      "F#3": "Fs3.mp3",
-      A3: "A3.mp3",
-      C4: "C4.mp3",
-      "D#4": "Ds4.mp3",
-      "F#4": "Fs4.mp3",
-      A4: "A4.mp3",
-      C5: "C5.mp3",
-      A5: "A5.mp3",
+      A2: "A2.mp3", C3: "C3.mp3", "D#3": "Ds3.mp3", "F#3": "Fs3.mp3",
+      A3: "A3.mp3", C4: "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3",
+      A4: "A4.mp3", C5: "C5.mp3", A5: "A5.mp3",
     },
     release: 1,
     baseUrl: "https://tonejs.github.io/audio/salamander/",
@@ -57,17 +49,11 @@ async function initAudio() {
 
   celloSampler = new Tone.Sampler({
     urls: {
-      A2: "A2.mp3",
-      C3: "C3.mp3",
-      E3: "E3.mp3",
-      A3: "A3.mp3",
-      C4: "C4.mp3",
-      E4: "E4.mp3",
-      A4: "A4.mp3",
+      A2: "A2.mp3", C3: "C3.mp3", E3: "E3.mp3",
+      A3: "A3.mp3", C4: "C4.mp3", E4: "E4.mp3", A4: "A4.mp3",
     },
     release: 2,
-    baseUrl:
-      "https://raw.githubusercontent.com/nbrosowsky/tonejs-instruments/master/samples/cello/",
+    baseUrl: "https://raw.githubusercontent.com/nbrosowsky/tonejs-instruments/master/samples/cello/",
   }).connect(reverb);
 
   currentSynth = pianoSampler;
@@ -101,14 +87,13 @@ function setInstrument(inst) {
   } else {
     currentSynth = celloSampler;
     slider.style.transform = "translateX(100%)";
-    slider.style.left = "6px"; // Ajuste fino para o novo padding (antes era 0 ou 4)
+    slider.style.left = "6px"; 
 
     btnCello.classList.replace("text-slate-400", "text-white");
     btnPiano.classList.replace("text-white", "text-slate-400");
   }
 }
 
-// Lógica de Mute
 function toggleMute() {
   isMuted = !isMuted;
   Tone.Destination.mute = isMuted;
@@ -131,9 +116,7 @@ function playNote(note) {
     const vel = 0.6 + Math.random() * 0.4;
     const dur = currentInstrument === "cello" ? "2n" : "2n";
     currentSynth.triggerAttackRelease(note, dur, Tone.now(), vel);
-  } catch (e) {
-    console.error(e);
-  }
+  } catch (e) { console.error(e); }
 }
 
 function switchTab(tab) {
@@ -155,10 +138,7 @@ let currentSequence = [];
 
 function encryptText() {
   let rawInput = document.getElementById("input-text").value;
-
-  // Divide por linhas primeiro para separar os blocos visuais
   const lines = rawInput.split("\n");
-
   const wrapper = document.getElementById("encrypt-output-wrapper");
   const container = document.getElementById("encrypt-result-container");
 
@@ -168,38 +148,27 @@ function encryptText() {
 
   if (!rawInput.trim()) {
     if (isPlaying) stopSequence();
-    wrapper.innerHTML =
-      '<span class="text-slate-500 w-full text-center">Digite algo para cifrar...</span>';
+    container.classList.add("hidden");
     return;
   }
 
-  // Processa linha por linha
   lines.forEach((lineText, lineIndex) => {
-    if (!lineText.trim()) return; // Pula linhas vazias
+    if (!lineText.trim()) return;
 
-    // Cria o container da "Partitura X"
     const lineContainer = document.createElement("div");
-    lineContainer.className =
-      "bg-[#1a1a1a] p-4 rounded-lg border-2 border-slate-600 shadow-inner";
+    lineContainer.className = "bg-[#1a1a1a] p-4 rounded-lg border-2 border-slate-600 shadow-inner";
 
-    // Label da Partitura (se tiver mais de 1 linha)
     if (lines.length > 1) {
       const label = document.createElement("h4");
-      label.innerText = `Partitura ${lineIndex + 1}`; // Partitura 1, 2...
-      label.className =
-        "text-[10px] uppercase text-amber-600 font-bold mb-2 tracking-widest";
+      label.innerText = `Partitura ${lineIndex + 1}`;
+      label.className = "text-[10px] uppercase text-amber-600 font-bold mb-2 tracking-widest";
       lineContainer.appendChild(label);
     }
 
-    // Container das notas
     const notesDiv = document.createElement("div");
-    notesDiv.className =
-      "flex flex-wrap gap-2 items-center justify-start overflow-x-auto";
+    notesDiv.className = "flex flex-wrap gap-2 items-center justify-start overflow-x-auto";
 
-    let processedLine = lineText
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toUpperCase();
+    let processedLine = lineText.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
 
     for (let char of processedLine) {
       if (codeMap[char]) {
@@ -207,70 +176,54 @@ function encryptText() {
         currentSequence.push(note);
 
         const span = document.createElement("div");
-        span.className =
-          "flex flex-col items-center group cursor-pointer p-1 rounded hover:bg-slate-800 transition-all min-w-[30px]";
+        span.className = "flex flex-col items-center group cursor-pointer p-1 rounded hover:bg-slate-800 transition-all min-w-[30px]";
         span.onclick = () => playNote(note);
 
         const noteText = document.createElement("span");
-        noteText.className =
-          "text-amber-400 font-bold group-hover:text-amber-200 transition-colors text-base";
+        noteText.className = "text-amber-400 font-bold group-hover:text-amber-200 transition-colors text-base";
         noteText.innerText = note;
 
         const letterText = document.createElement("span");
-        letterText.className =
-          "decrypted-hint text-[8px] text-slate-500 mt-1 uppercase font-bold transition-all";
+        letterText.className = "decrypted-hint text-[8px] text-slate-500 mt-1 uppercase font-bold transition-all";
         letterText.innerText = char;
 
         span.appendChild(noteText);
         span.appendChild(letterText);
         notesDiv.appendChild(span);
 
-        // Barra
         const bar = document.createElement("span");
-        bar.className =
-          "text-slate-700 mx-0 select-none font-thin text-xl opacity-30";
+        bar.className = "text-slate-700 mx-0 select-none font-thin text-xl opacity-30";
         bar.innerText = "|";
         notesDiv.appendChild(bar);
       } else if (char === " ") {
         const space = document.createElement("div");
-        space.className =
-          "w-6 h-1 bg-slate-600 mx-1 self-center rounded opacity-50";
+        space.className = "w-6 h-1 bg-slate-600 mx-1 self-center rounded opacity-50";
         notesDiv.appendChild(space);
         currentSequence.push(null);
       }
     }
-
     lineContainer.appendChild(notesDiv);
     wrapper.appendChild(lineContainer);
-
-    // Adiciona uma pausa longa no áudio entre as linhas
+    
+    // Pausa entre linhas
     currentSequence.push(null);
     currentSequence.push(null);
   });
 }
 
-// --- FUNÇÃO DE COPIAR ---
 function copyToClipboard(type) {
   let rawInput = document.getElementById("input-text").value;
   let textToCopy = "";
-
   const lines = rawInput.split("\n");
 
   lines.forEach((line) => {
     if (!line.trim()) return;
     let lineResult = [];
-    let processed = line
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toUpperCase();
-
+    let processed = line.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
     for (let char of processed) {
       if (codeMap[char]) {
-        if (type === "full") {
-          lineResult.push(`${codeMap[char]} (${char})`);
-        } else {
-          lineResult.push(codeMap[char]);
-        }
+        if (type === "full") lineResult.push(`${codeMap[char]} (${char})`);
+        else lineResult.push(codeMap[char]);
       } else if (char === " ") {
         lineResult.push("|");
       }
@@ -278,24 +231,15 @@ function copyToClipboard(type) {
     textToCopy += lineResult.join(" ") + "\n";
   });
 
-  navigator.clipboard
-    .writeText(textToCopy)
-    .then(() => {
-      alert("Cifra copiada com sucesso!");
-    })
-    .catch((err) => {
-      console.error("Erro ao copiar", err);
-    });
+  navigator.clipboard.writeText(textToCopy).then(() => {
+    toggleCopyMenu(); // Fecha o menu
+    alert("Copiado!");
+  }).catch((err) => console.error(err));
 }
 
-// --- PLAY/PAUSE ---
 function togglePlay() {
-  if (!isAudioInit) {
-    alert("Ative o áudio primeiro!");
-    return;
-  }
-  if (isPlaying) stopSequence();
-  else playSequence();
+  if (!isAudioInit) { alert("Ative o áudio primeiro!"); return; }
+  if (isPlaying) stopSequence(); else playSequence();
 }
 
 function updatePlayButtonUI() {
@@ -316,20 +260,16 @@ function updatePlayButtonUI() {
   }
 }
 
+// --- FUNÇÃO DE REVELAÇÃO (DECIFRAR V2) ---
 function revealCode() {
-  if (!isAudioInit) {
-    alert("Ative o áudio primeiro!");
-    return;
-  }
-  if (isPlaying) {
-    stopSequence();
-    return;
-  }
+  if (!isAudioInit) { alert("Ative o áudio primeiro!"); return; }
+  if (isPlaying) { stopSequence(); return; }
 
   const inputText = document.getElementById("decrypt-input").value;
   const outputElement = document.getElementById("decrypt-output");
-  outputElement.value = "";
+  outputElement.value = ""; // Limpa antes de começar
 
+  // Separa por espaços e remove vazios
   const notes = inputText.trim().toUpperCase().split(/\s+/).filter(n => n.trim() !== '');
 
   if (notes.length === 0) return;
@@ -338,16 +278,24 @@ function revealCode() {
   const duration = currentInstrument === "cello" ? "2n" : "8n";
   let currentTime = 0;
 
+  Tone.Transport.stop();
   Tone.Transport.cancel();
 
   notes.forEach(note => {
+    // Se for barra |, é um espaço no texto
     if (note === '|') {
-        currentTime += step;
-        return;
+      Tone.Transport.schedule(time => {
+        Tone.Draw.schedule(() => {
+          outputElement.value += ' ';
+        }, time);
+      }, currentTime);
+      currentTime += step; // Consome tempo como uma pausa
+      return;
     }
 
     const letter = reverseMap[note];
     if (letter) {
+      // Agenda o som
       Tone.Transport.schedule(time => {
         if (!isMuted) {
           const vel = 0.6 + Math.random() * 0.4;
@@ -355,6 +303,7 @@ function revealCode() {
         }
       }, currentTime);
 
+      // Agenda a aparição da letra (sincronizada)
       Tone.Transport.schedule(time => {
         Tone.Draw.schedule(() => {
           outputElement.value += letter;
@@ -362,11 +311,10 @@ function revealCode() {
       }, currentTime);
       
       currentTime += step;
-    } else {
-        currentTime += step / 2;
     }
   });
 
+  // Agenda o fim para parar o botão
   Tone.Transport.schedule(() => {
     stopSequence();
   }, currentTime + 0.5);
@@ -374,6 +322,22 @@ function revealCode() {
   isPlaying = true;
   updatePlayButtonUI();
   Tone.Transport.start();
+}
+
+function copyDecryptedText() {
+  const outputElement = document.getElementById("decrypt-output");
+  const textToCopy = outputElement.value;
+
+  if (!textToCopy) {
+    alert("Não há nada para copiar!");
+    return;
+  }
+
+  navigator.clipboard.writeText(textToCopy).then(() => {
+    alert("Texto revelado copiado para a área de transferência!");
+  }).catch(err => {
+    console.error("Falha ao copiar texto: ", err);
+  });
 }
 
 function playSequence() {
@@ -398,9 +362,7 @@ function playSequence() {
     }
   });
 
-  Tone.Transport.schedule(() => {
-    stopSequence();
-  }, currentTime + 0.5);
+  Tone.Transport.schedule(() => { stopSequence(); }, currentTime + 0.5);
   isPlaying = true;
   updatePlayButtonUI();
   Tone.Transport.start();
@@ -414,7 +376,6 @@ function clearEncrypt() {
   currentSequence = [];
 }
 
-// --- TECLADO E UTILITÁRIOS ---
 function generateKeyboard() {
   const container = document.getElementById("piano-container");
   container.innerHTML = "";
@@ -423,9 +384,7 @@ function generateKeyboard() {
   orderedNotes.forEach((note) => {
     const letter = reverseMap[note];
     const btn = document.createElement("button");
-    // Classes responsivas ajustadas: w-9 (mobile) -> w-12 (tablet) -> w-14 (PC)
-    btn.className =
-      "note-key flex-shrink-0 flex flex-col justify-center items-center m-0.5 rounded-md shadow-lg border-b-4 focus:outline-none white-key-style w-9 h-20 sm:w-12 sm:h-28 md:w-14 md:h-32 transition-all";
+    btn.className = "note-key flex-shrink-0 flex flex-col justify-center items-center m-0.5 rounded-md shadow-lg border-b-4 focus:outline-none white-key-style w-9 h-20 sm:w-12 sm:h-28 md:w-14 md:h-32 transition-all";
     btn.innerHTML = `<span class="font-bold text-lg mb-2 z-10 text-slate-800">${note}</span><span class="hint-text text-sm font-bold text-amber-600 opacity-60 font-mono border-t border-slate-300 pt-2 w-full text-center transition-opacity">${letter}</span>`;
     btn.onclick = () => {
       playNote(note);
@@ -447,8 +406,7 @@ function populateReferenceTable() {
   table.innerHTML = "";
   alphabet.forEach((letter) => {
     const div = document.createElement("div");
-    div.className =
-      "bg-slate-700/30 p-2 rounded flex flex-col items-center border border-slate-600 hover:bg-slate-700 transition-colors";
+    div.className = "bg-slate-700/30 p-2 rounded flex flex-col items-center border border-slate-600 hover:bg-slate-700 transition-colors";
     div.innerHTML = `<span class="text-amber-500 font-bold text-sm mb-1">${codeMap[letter]}</span><span class="text-slate-400 text-[10px] border-t border-slate-600 w-full pt-1">${letter}</span>`;
     table.appendChild(div);
   });
@@ -466,13 +424,11 @@ function toggleSecretMode() {
   if (input.classList.contains("secret-mode")) {
     icon.innerText = "visibility_off";
     text.innerText = "Modo Sigilo (Ativo)";
-    text.classList.remove("text-slate-500");
-    text.classList.add("text-amber-500");
+    text.classList.remove("text-slate-500"); text.classList.add("text-amber-500");
   } else {
     icon.innerText = "visibility";
     text.innerText = "Modo Público";
-    text.classList.add("text-slate-500");
-    text.classList.remove("text-amber-500");
+    text.classList.add("text-slate-500"); text.classList.remove("text-amber-500");
   }
 }
 
@@ -485,40 +441,34 @@ function toggleHints() {
   const icon = document.getElementById("icon-hints");
   const text = document.getElementById("text-hints");
   if (areHintsVisible) {
-    icon.innerText = "visibility";
-    text.innerText = 'Ocultar "Cola"';
-    icon.classList.remove("text-slate-500");
-    icon.classList.add("text-amber-500");
-    text.classList.remove("text-slate-500");
-    text.classList.add("text-amber-500");
+    icon.innerText = "visibility"; text.innerText = 'Ocultar "Cola"';
+    icon.classList.remove("text-slate-500"); icon.classList.add("text-amber-500");
+    text.classList.remove("text-slate-500"); text.classList.add("text-amber-500");
   } else {
-    icon.innerText = "visibility_off";
-    text.innerText = 'Mostrar "Cola"';
-    icon.classList.remove("text-amber-500");
-    icon.classList.add("text-slate-500");
-    text.classList.remove("text-amber-500");
-    text.classList.add("text-slate-500");
+    icon.innerText = "visibility_off"; text.innerText = 'Mostrar "Cola"';
+    icon.classList.remove("text-amber-500"); icon.classList.add("text-slate-500");
+    text.classList.remove("text-amber-500"); text.classList.add("text-slate-500");
   }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
-  generateKeyboard();
-  populateReferenceTable();
-  toggleHints(); // Garante que as dicas começam ocultas
-});
-
-// --- MENU COPIAR (CLIQUE) ---
 function toggleCopyMenu() {
   const menu = document.getElementById("copy-menu");
-  menu.classList.toggle("hidden");
+  if(menu) menu.classList.toggle("hidden");
 }
 
-// Fecha o menu se clicar fora
 document.addEventListener("click", function (event) {
   const menu = document.getElementById("copy-menu");
   const btn = event.target.closest('button[onclick="toggleCopyMenu()"]');
-
   if (!btn && menu && !menu.classList.contains("hidden")) {
     menu.classList.add("hidden");
   }
+});
+
+// Inicialização segura
+window.addEventListener("DOMContentLoaded", () => {
+  generateKeyboard();
+  populateReferenceTable();
+  // Garante que a dica começa OCULTA (false)
+  areHintsVisible = true; // Inverte para chamar a função e setar false visualmente
+  toggleHints(); 
 });

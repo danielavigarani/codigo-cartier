@@ -297,27 +297,35 @@
           <!-- SEÇÃO DE RESULTADO -->
           <div class="mb-6 relative pt-6 border-t border-slate-700">
             <div class="flex justify-between items-center mb-2">
-              <label
-                class="block text-amber-500 text-sm font-bold uppercase tracking-wider"
-                >Mensagem Revelada</label
-              >
-              <button
-                class="text-xs text-slate-400 hover:text-white uppercase flex items-center"
-                onclick="document.getElementById('decrypt-output').value = document.getElementById('decrypt-output').value.slice(0, -1);"
-              >
-                <span class="material-symbols-outlined text-sm mr-1"
-                  >backspace</span
+              <label class="block text-amber-500 text-sm font-bold uppercase tracking-wider">Mensagem Revelada</label>
+              <div class="flex items-center gap-4">
+                <button
+                  class="text-xs text-slate-400 hover:text-white uppercase flex items-center transition-colors"
+                  onclick="copyDecryptedText()"
+                  title="Copiar texto revelado"
                 >
-                Apagar Última
-              </button>
+                  <span class="material-symbols-outlined text-sm mr-1">content_copy</span>
+                  Copiar Texto
+                </button>
+                <button
+                  class="text-xs text-slate-400 hover:text-white uppercase flex items-center transition-colors"
+                  onclick="document.getElementById('decrypt-output').value = document.getElementById('decrypt-output').value.slice(0, -1);"
+                >
+                  <span class="material-symbols-outlined text-sm mr-1"
+                    >backspace</span
+                  >
+                  Apagar Última
+                </button>
+              </div>
             </div>
-            <input
+            <textarea
               class="w-full bg-slate-900 text-amber-500 text-3xl md:text-4xl font-bold border-b-2 border-slate-600 focus:outline-none p-4 text-center tracking-[0.2em] font-mono h-20 rounded-t-md shadow-inner"
               id="decrypt-output"
-              readonly=""
-              type="text"
+              readonly
               placeholder="..."
-            />
+              rows="3"
+              style="resize: vertical;"
+            ></textarea>
             <div class="text-center text-xs text-slate-500 mt-2">
               As letras aparecerão aqui em sincronia com o áudio.
             </div>
