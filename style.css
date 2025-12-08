@@ -1,113 +1,91 @@
 /* Estilos Personalizados */
 body {
-    font-family: 'Courier Prime', monospace;
-    background-color: #0f172a; /* Slate 900 */
-    color: #e2e8f0; /* Slate 200 */
+  font-family: "Courier Prime", monospace;
+  background-color: #0f172a; /* Slate 900 */
+  color: #e2e8f0; /* Slate 200 */
 }
 
-h1, h2, h3, .cartier-font {
-    font-family: 'Playfair Display', serif;
+h1,
+h2,
+h3,
+.cartier-font {
+  font-family: "Playfair Display", serif;
 }
 
 .note-key {
-    transition: all 0.1s ease;
+  transition: all 0.1s ease;
 }
 
 .note-key:active {
-    transform: scale(0.95);
-}
-
-/* Estilização específica para teclas */
-.black-key-style {
-    background-color: #1e293b;
-    border-color: #475569;
-    color: #d97706; /* Amber 600 text */
-}
-
-.white-key-style {
-    background-color: #e2e8f0;
-    border-color: #cbd5e1;
-    color: #0f172a; /* Dark text */
-}
-
-.active-note {
-    background-color: #d97706 !important; /* Amber 600 */
-    color: white !important;
-    border-color: #fbbf24 !important;
-    box-shadow: 0 0 15px rgba(217, 119, 6, 0.5);
+  transform: scale(0.95);
 }
 
 /* Scrollbar customizada */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: #1e293b; 
+  background: #1e293b;
 }
 ::-webkit-scrollbar-thumb {
-    background: #475569; 
-    border-radius: 4px;
+  background: #475569;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #64748b; 
+  background: #64748b;
 }
 
 .animate-fade-in {
-    animation: fadeIn 0.5s ease-in-out;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Modo Sigilo para Stream/Compartilhamento */
 .secret-mode {
-    filter: blur(5px);
-    transition: filter 0.3s ease;
-    cursor: text;
+  filter: blur(5px);
+  transition: filter 0.3s ease;
+  cursor: text;
 }
 
 .secret-mode:focus {
-    /* Opcional: Se quiser que desembaçe levemente quando você clica, senão apague essa linha */
-    filter: blur(4px); 
-}
-
-/* --- CSS NOVO PARA O MODO SIGILO --- */
-
-/* Oculta as letras da tradução (as "colas") quando o modo secreto está ativo */
-.secret-output .decrypted-hint {
-    filter: blur(8px);
-    opacity: 0.3;
-    user-select: none; /* Impede que selecionem o texto borrado */
-}
-
-/* Mantém as notas (C4, A2) visíveis, mas esconde a letra do alfabeto */
-.secret-mode {
-    filter: blur(5px);
-    transition: filter 0.3s ease;
-}
-/* Isso garante que a 'Cola' suma quando o Modo Sigilo está ligado */
-.secret-output .decrypted-hint {
-    opacity: 0 !important; /* Forcei com !important para garantir */
-    filter: blur(8px);
-    transition: all 0.3s ease;
-}
-
-/* --- MODO SIGILO (STREAMER) --- */
-.secret-mode {
-    filter: blur(5px);
-    transition: filter 0.3s ease;
-    cursor: text;
-}
-.secret-mode:focus {
-    filter: blur(4px); 
+  filter: blur(4px);
 }
 
 /* Garante que as letras sumam no modo sigilo */
 .secret-output .decrypted-hint {
-    opacity: 0 !important;
-    filter: blur(8px);
-    transition: all 0.3s ease;
+  opacity: 0 !important;
+  filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+/* Estilo para teclas brancas unificado */
+.white-key-style {
+  background-color: #e2e8f0;
+  border-color: #cbd5e1;
+  color: #0f172a; /* Dark text */
+}
+
+/* Placeholder personalizado para 1rem */
+.custom-placeholder::placeholder {
+  font-size: 1rem;
+  color: #64748b; /* Slate 500 */
+}
+
+/* Responsividade do texto de saída */
+.note-container-responsive {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 0.5rem;
 }
