@@ -88,3 +88,81 @@
 3.  **Botão Copiar Texto:**
     - Adicionar um botão "Copiar Texto" ao lado do botão "Apagar Última" na aba Decifrar.
     - Criar função JS `copyDecryptedText()` que copia o conteúdo do `#decrypt-output`.
+
+## 8. Fase 3.2: Harmonização do Decifrar
+
+**Objetivo:** Alinhar o design da aba Decifrar com a aba Cifrar e corrigir a formatação do texto revelado.
+
+### Requisitos de Layout (HTML/CSS):
+
+1.  **Reposicionamento:** O campo de entrada de código (`#decrypt-input`) deve ser movido para ficar visualmente consistente, talvez acima do resultado mas com menos destaque, ou seguir o fluxo: _Input -> Botão Revelar -> Resultado_.
+2.  **Estilo do Resultado:** O `#decrypt-output` deve se parecer mais com o container de partituras da aba Cifrar (fundo escuro, borda sutil), garantindo leitura confortável.
+3.  **Piano:** Deve permanecer acessível abaixo de tudo para quem quiser decifrar manualmente nota por nota.
+
+### Requisitos de Lógica (JS):
+
+1.  **Quebra de Linha Real:** A função `revealCode` deve detectar quebras de linha (`\n`) no input cifrado e replicá-las no output decifrado.
+    - _Lógica sugerida:_ Ao processar os tokens, se encontrar uma quebra de linha original, inserir `\n` no valor do textarea de resultado.
+2.  **Espaços:** Continuar respeitando o caractere `|` como espaço em branco (` `).
+
+### Meta Final:
+
+O usuário deve poder colar um bloco de texto cifrado com várias linhas e ver o resultado decifrado mantendo a mesma estrutura de parágrafos.
+
+## 9. Fase 3.3: Refinamento de Quebra de Linha (Decifrar)
+
+**Problema:** O texto revelado está ignorando as quebras de linha originais do código cifrado, juntando parágrafos.
+
+### Requisitos Técnicos (JS - `revealCode`):
+
+1.  **Preservação de Linhas:** A função deve ler o input e processar linha por linha, em vez de tratar tudo como um "sopão" de tokens.
+2.  **Lógica Sugerida:**
+    - Dividir o input bruto por quebras de linha (`\n`).
+    - Para cada linha do input, processar as notas e adicionar as letras correspondentes no output.
+    - Ao final de cada linha processada, adicionar explicitamente um `\n` no output (se não for a última linha).
+3.  **Visual:** O `textarea` de resultado deve refletir essas quebras (o que já faz por padrão).
+
+### Meta:\*\*
+
+Input Cifrado:
+Line 1...
+Line 2...
+
+Output Revelado:
+Texto 1...
+Texto 2...
+
+## 10. Fase 3.4: Ajustes de Fluxo e Correções Críticas (Decifrar)
+
+**Objetivo:** Corrigir bugs de duplicação de texto, melhorar a cópia de formatação e adicionar controles de reprodução.
+
+### Correções de Bugs (Prioridade Alta):
+
+1.  **Letras Duplicadas (`revealCode`):**
+    - _Sintoma:_ O texto revelado às vezes duplica caracteres (ex: "GENNTE" em vez de "GENTE").
+    - _Causa Provável:_ O callback visual do `Tone.Transport` ou `Tone.Draw` está sendo disparado mais de uma vez por nota.
+    - _Solução:_ Refatorar a lógica de agendamento visual para garantir que cada nota dispare a escrita da letra exatamente uma vez.
+2.  **Cópia de Cifra (Quebra de Linha):**
+    - _Sintoma:_ Ao copiar a cifra gerada, os parágrafos (linhas vazias) são perdidos.
+    - _Solução:_ A função `copyToClipboard` deve preservar linhas vazias explicitamente ao processar o texto.
+
+### Novas Funcionalidades:
+
+1.  **Botão "Pular Animação" (Acelerar):**
+    - Adicionar um botão "Pular" que aparece apenas durante a revelação (`isPlaying = true`).
+    - _Ação:_ Para o áudio imediatamente (`Tone.Transport.stop()`), cancela o agendamento e preenche o `#decrypt-output` instantaneamente com o texto completo traduzido.
+2.  **Botão "Enter" (Teclado Virtual):**
+    - Adicionar um botão de "Quebra de Linha" (ícone de Enter ↵) junto às teclas do piano virtual ou na barra de ferramentas do Decifrar, para permitir formatação manual.
+
+## 11. Fase 3.5: Correção de Duplicação e Formatação (Prioridade Máxima)
+
+**Problema:** A animação de revelação (`revealCode`) está duplicando caracteres visualmente (ex: "GENNTE"). Além disso, a cópia da cifra ignora quebras de linha.
+
+### Solução Técnica (JS):
+
+1.  **Animação de Texto:** Substituir `Tone.Draw` por `setTimeout` para a escrita das letras.
+    - _Motivo:_ `Tone.Draw` pode disparar múltiplos callbacks em alguns loops de renderização. `setTimeout` baseado no tempo acumulado é atômico e seguro.
+    - _Lógica:_ Calcular o tempo exato em ms (`currentTime * 1000`) e agendar a inserção da letra.
+    - _Limpeza:_ Armazenar os IDs dos timeouts em um array `revealTimeouts` e limpá-los ao parar/pular.
+2.  **Botão Pular:** A função `skipReveal` deve limpar os timeouts pendentes e definir o valor do output imediatamente com o texto completo traduzido.
+3.  **Cópia de Cifra (`copyToClipboard`):** O loop de processamento deve respeitar explicitamente as linhas vazias ou quebras de linha do input original, inserindo `\n` no texto copiado.

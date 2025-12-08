@@ -31,6 +31,13 @@ let currentInstrument = "piano";
 let isPlaying = false;
 let isMuted = false;
 
+let revealTimeouts = []; // Array para guardar os timeouts da revelação
+
+function clearTimeouts() {
+  revealTimeouts.forEach(id => clearTimeout(id));
+  revealTimeouts = [];
+}
+
 async function initAudio() {
   if (isAudioInit) return;
   await Tone.start();
@@ -65,10 +72,13 @@ async function initAudio() {
 }
 
 function stopSequence() {
+  clearTimeouts(); // Limpa timeouts de revelação pendentes
   Tone.Transport.stop();
   Tone.Transport.cancel();
   isPlaying = false;
   updatePlayButtonUI();
+  // Garante que o botão de pular seja escondido ao parar
+  document.getElementById('btn-skip-reveal').classList.add('hidden');
 }
 
 function setInstrument(inst) {
@@ -213,28 +223,30 @@ function encryptText() {
 
 function copyToClipboard(type) {
   let rawInput = document.getElementById("input-text").value;
-  let textToCopy = "";
   const lines = rawInput.split("\n");
 
-  lines.forEach((line) => {
-    if (!line.trim()) return;
-    let lineResult = [];
-    let processed = line.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
-    for (let char of processed) {
+  const processedLines = lines.map(line => {
+    if (!line.trim()) {
+      return ""; // Preserva a linha vazia
+    }
+    const lineResult = [];
+    const processed = line.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+    for (const char of processed) {
       if (codeMap[char]) {
-        if (type === "full") lineResult.push(`${codeMap[char]} (${char})`);
-        else lineResult.push(codeMap[char]);
+        lineResult.push(type === "full" ? `${codeMap[char]} (${char})` : codeMap[char]);
       } else if (char === " ") {
         lineResult.push("|");
       }
     }
-    textToCopy += lineResult.join(" ") + "\n";
+    return lineResult.join(" ");
   });
 
+  const textToCopy = processedLines.join("\n");
+  
   navigator.clipboard.writeText(textToCopy).then(() => {
     toggleCopyMenu(); // Fecha o menu
     alert("Copiado!");
-  }).catch((err) => console.error(err));
+  }).catch((err) => console.error("Falha ao copiar: ", err));
 }
 
 function togglePlay() {
@@ -260,7 +272,36 @@ function updatePlayButtonUI() {
   }
 }
 
-// --- FUNÇÃO DE REVELAÇÃO (DECIFRAR V2) ---
+// --- FUNÇÕES DE REVELAÇÃO (DECIFRAR) ---
+
+function translateCipher(inputText) {
+  const lines = inputText.trim().toUpperCase().split('\n');
+  const translatedLines = lines.map(line => {
+    const tokens = line.split(/\s+/).filter(token => token.trim() !== '');
+    return tokens.map(token => {
+      if (token === '|') {
+        return ' ';
+      }
+      const letter = reverseMap[token];
+      return letter || '';
+    }).join('');
+  });
+  return translatedLines.join('\n');
+}
+
+function skipReveal() {
+  if (!isPlaying) return;
+  
+  const inputText = document.getElementById("decrypt-input").value;
+  const outputElement = document.getElementById("decrypt-output");
+  
+  // Para a animação e preenche o texto completo imediatamente
+  outputElement.value = translateCipher(inputText);
+  
+  // Para o áudio e reseta a UI
+  stopSequence();
+}
+
 function revealCode() {
   if (!isAudioInit) { alert("Ative o áudio primeiro!"); return; }
   if (isPlaying) { stopSequence(); return; }
@@ -268,11 +309,14 @@ function revealCode() {
   const inputText = document.getElementById("decrypt-input").value;
   const outputElement = document.getElementById("decrypt-output");
   outputElement.value = ""; // Limpa antes de começar
+  clearTimeouts(); // Limpa qualquer timeout de revelação anterior
 
-  // Separa por espaços e remove vazios
-  const notes = inputText.trim().toUpperCase().split(/\s+/).filter(n => n.trim() !== '');
+  const lines = inputText.trim().toUpperCase().split('\n');
 
-  if (notes.length === 0) return;
+  if (lines.length === 0 || (lines.length === 1 && lines[0] === '')) return;
+
+  // Mostra o botão de pular animação
+  document.getElementById('btn-skip-reveal').classList.remove('hidden');
   
   const step = currentInstrument === "cello" ? 0.8 : 0.25;
   const duration = currentInstrument === "cello" ? "2n" : "8n";
@@ -281,36 +325,41 @@ function revealCode() {
   Tone.Transport.stop();
   Tone.Transport.cancel();
 
-  notes.forEach(note => {
-    // Se for barra |, é um espaço no texto
-    if (note === '|') {
-      Tone.Transport.schedule(time => {
-        Tone.Draw.schedule(() => {
-          outputElement.value += ' ';
-        }, time);
-      }, currentTime);
-      currentTime += step; // Consome tempo como uma pausa
-      return;
-    }
+  lines.forEach((line, lineIndex) => {
+    const tokens = line.split(/\s+/).filter(token => token.trim() !== '');
 
-    const letter = reverseMap[note];
-    if (letter) {
-      // Agenda o som
-      Tone.Transport.schedule(time => {
-        if (!isMuted) {
-          const vel = 0.6 + Math.random() * 0.4;
-          currentSynth.triggerAttackRelease(note, duration, time, vel);
-        }
-      }, currentTime);
+    tokens.forEach(token => {
+      // Se for barra |, é um espaço no texto
+      if (token === '|') {
+        const timeoutId = setTimeout(() => { outputElement.value += ' '; }, currentTime * 1000);
+        revealTimeouts.push(timeoutId);
+        currentTime += step; // Consome tempo como uma pausa
+        return;
+      }
 
-      // Agenda a aparição da letra (sincronizada)
-      Tone.Transport.schedule(time => {
-        Tone.Draw.schedule(() => {
-          outputElement.value += letter;
-        }, time);
-      }, currentTime);
-      
-      currentTime += step;
+      const letter = reverseMap[token];
+      if (letter) {
+        // Agenda o som
+        Tone.Transport.schedule(time => {
+          if (!isMuted) {
+            const vel = 0.6 + Math.random() * 0.4;
+            currentSynth.triggerAttackRelease(token, duration, time, vel);
+          }
+        }, currentTime);
+        
+        // Agenda a letra com setTimeout para evitar duplicação
+        const timeoutId = setTimeout(() => { outputElement.value += letter; }, currentTime * 1000);
+        revealTimeouts.push(timeoutId);
+        
+        currentTime += step;
+      }
+    });
+
+    // Após processar todos os tokens de uma linha, adiciona a quebra de linha se não for a última
+    if (lineIndex < lines.length - 1) {
+      const timeoutId = setTimeout(() => { outputElement.value += '\n'; }, currentTime * 1000);
+      revealTimeouts.push(timeoutId);
+      currentTime += step * 2.0; // Pausa maior para quebra de linha
     }
   });
 
