@@ -5,8 +5,12 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Código Cartier - Ordem Paranormal</title>
 
+    <meta name="description" content="Ferramenta de Criptografia Musical baseada em Ordem Paranormal. Traduza textos para notas musicais e vice-versa." />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap"
       rel="stylesheet"
@@ -23,9 +27,9 @@
   >
     <div class="fixed inset-0 z-0 opacity-20 pointer-events-none">
       <img
-        alt="Atmosfera Musical"
+        alt=""
         class="w-full h-full object-cover"
-        src="data:image/svg+xml;base64,IDxzdmcgd2lkdGg9IjEwMjQiIGhlaWdodD0iMTAyNCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+IDxkZWZzPiA8bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSItMTAwJSIgeTE9IjAiIHgyPSIwIiB5Mj0iMCI+IDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2IwYjBiMCIvPiA8c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjZjBmMGYwIi8+IDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2IwYjBiMCIvPiA8YW5pbWF0ZVRyYW5zZm9ybSBpZD0iYSIgYXR0cmlidXRlTmFtZT0iZ3JhZGllbnRUcmFuc2Zvcm0iIHR5cGU9InRyYW5zbGF0ZSIgZnJvbT0iMCIgdG89IjIiIGR1cj0iMXMiIGJlZ2luPSIwcyIvPiA8YW5pbWF0ZVRyYW5zZm9ybSBpZD0iYiIgYXR0cmlidXRlTmFtZT0iZ3JhZGllbnRUcmFuc2Zvcm0iIHR5cGU9InRyYW5zbGF0ZSIgZnJvbT0iMCIgdG89IjIiIGR1cj0iMS41cyIgYmVnaW49ImEuZW5kIi8+IDxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9ImdyYWRpZW50VHJhbnNmb3JtIiB0eXBlPSJ0cmFuc2xhdGUiIGZyb209IjAiIHRvPSIyIiBkdXI9IjJzIiBiZWdpbj0iYi5lbmQiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+IDwvbGluZWFyR3JhZGllbnQ+IDwvZGVmcz4gPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9InVybCgjZykiLz4gPC9zdmc+"
+        src="background.svg"
       />
       <div
         class="absolute inset-0 bg-gradient-to-b from-[#0f172a] via-transparent to-[#0f172a]"
@@ -50,7 +54,7 @@
           class="group relative inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-slate-800 border border-amber-500/50 rounded-full hover:bg-amber-900/30 transition-all shadow-[0_0_15px_rgba(245,158,11,0.2)]"
           onclick="initAudio()"
         >
-          <span class="material-symbols-outlined mr-2 group-hover:animate-pulse"
+          <span class="material-symbols-outlined mr-2 group-hover:animate-pulse" aria-hidden="true"
             >music_note</span
           >
           Iniciar Sessão Musical (Ativar Áudio)
@@ -98,6 +102,7 @@
         <button
           onclick="toggleMute()"
           class="w-10 h-10 flex-shrink-0 rounded-full bg-slate-700 hover:bg-slate-600 border border-slate-600 flex items-center justify-center shadow-lg transition-all text-amber-500 group"
+            aria-label="Alternar som"
           title="Mutar/Desmutar"
         >
           <div id="icon-sound-on" class="block">
@@ -137,7 +142,7 @@
           id="tab-encrypt"
           onclick="switchTab('encrypt')"
         >
-          <span class="material-symbols-outlined mr-2 text-sm">lock</span>
+          <span class="material-symbols-outlined mr-2 text-sm" aria-hidden="true">lock</span>
           Cifrar (Esconder)
         </button>
         <button
@@ -145,7 +150,7 @@
           id="tab-decrypt"
           onclick="switchTab('decrypt')"
         >
-          <span class="material-symbols-outlined mr-2 text-sm">lock_open</span>
+          <span class="material-symbols-outlined mr-2 text-sm" aria-hidden="true">lock_open</span>
           Decifrar (Revelar)
         </button>
         <button
@@ -153,7 +158,7 @@
           id="tab-legend"
           onclick="switchTab('legend')"
         >
-          <span class="material-symbols-outlined mr-2 text-sm">menu_book</span>
+          <span class="material-symbols-outlined mr-2 text-sm" aria-hidden="true">menu_book</span>
           Manual & Teoria
         </button>
       </div>
@@ -165,6 +170,7 @@
           <div class="flex justify-between items-center mb-2">
             <label
               class="block text-amber-500 text-sm font-bold uppercase tracking-wider"
+              for="input-text"
               >ESCREVA COM O CORAÇÃO</label
             >
             <button
@@ -173,7 +179,7 @@
               title="Ocultar texto para transmissão"
             >
               <span
-                class="material-symbols-outlined text-sm mr-1"
+                class="material-symbols-outlined text-sm mr-1" aria-hidden="true"
                 id="icon-secret"
                 >visibility</span
               >
@@ -193,7 +199,7 @@
               class="bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 px-6 rounded-lg shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center"
               onclick="encryptText()"
             >
-              <span class="material-symbols-outlined mr-2">piano</span> Traduzir
+              <span class="material-symbols-outlined mr-2" aria-hidden="true">piano</span> Traduzir
               para Notas
             </button>
 
@@ -214,10 +220,11 @@
               <div class="relative">
                 <button
                   onclick="toggleCopyMenu()"
+                  aria-label="Opções de Cópia"
                   class="flex items-center justify-center w-10 h-10 bg-slate-700 rounded-full border border-slate-600 hover:bg-slate-600 transition-all text-slate-200 shadow hover:shadow-slate-500/20 active:scale-95"
                   title="Opções de Cópia"
                 >
-                  <span class="material-symbols-outlined text-xl"
+                  <span class="material-symbols-outlined text-xl" aria-hidden="true"
                     >content_copy</span
                   >
                 </button>
@@ -230,14 +237,14 @@
                     onclick="copyToClipboard('full')"
                     class="block w-full text-left px-4 py-3 text-xs text-slate-300 hover:bg-slate-700 hover:text-white border-b border-slate-700/50 transition-colors flex items-center"
                   >
-                    <span class="material-symbols-outlined text-sm mr-2 opacity-70">description</span>
+                    <span class="material-symbols-outlined text-sm mr-2 opacity-70" aria-hidden="true">description</span>
                     Completo (Nota + Letra)
                   </button>
                   <button
                     onclick="copyToClipboard('code')"
                     class="block w-full text-left px-4 py-3 text-xs text-slate-300 hover:bg-slate-700 hover:text-white transition-colors flex items-center"
                   >
-                    <span class="material-symbols-outlined text-sm mr-2 opacity-70">code</span>
+                    <span class="material-symbols-outlined text-sm mr-2 opacity-70" aria-hidden="true">code</span>
                     Apenas Cifra (A2 B2...)
                   </button>
                 </div>
@@ -249,7 +256,7 @@
                 onclick="togglePlay()"
               >
                 <span
-                  class="material-symbols-outlined text-xl mr-2"
+                  class="material-symbols-outlined text-xl mr-2" aria-hidden="true"
                   id="icon-play"
                   >play_circle</span
                 >
@@ -282,6 +289,7 @@
               class="w-full bg-slate-900/50 text-white border border-slate-600 rounded-lg p-4 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all font-mono text-lg uppercase shadow-inner custom-placeholder"
               placeholder="Ex: C4 G3 | A3..."
               rows="3"
+              spellcheck="false"
             ></textarea>
           </div>
 
@@ -290,7 +298,7 @@
                 class="bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 px-8 rounded-lg shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center"
                 onclick="revealCode()"
             >
-                <span class="material-symbols-outlined mr-2">hearing</span>
+                <span class="material-symbols-outlined mr-2" aria-hidden="true">hearing</span>
                 Ouvir & Revelar
             </button>
           </div>
@@ -301,7 +309,7 @@
                 class="hidden bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-2 px-4 rounded-full shadow-lg transition-all flex items-center animate-fade-in"
                 onclick="skipReveal()"
             >
-                <span class="material-symbols-outlined mr-2">fast_forward</span>
+                <span class="material-symbols-outlined mr-2" aria-hidden="true">fast_forward</span>
                 Pular Animação
             </button>
           </div>
@@ -309,14 +317,14 @@
           <!-- SEÇÃO DE RESULTADO -->
           <div class="mb-6 relative pt-6 border-t border-slate-700">
             <div class="flex justify-between items-center mb-2">
-              <label class="block text-amber-500 text-sm font-bold uppercase tracking-wider">Mensagem Revelada</label>
+              <label class="block text-amber-500 text-sm font-bold uppercase tracking-wider" for="decrypt-output">Mensagem Revelada</label>
               <div class="flex items-center gap-4">
                 <button
                   class="text-xs text-slate-400 hover:text-white uppercase flex items-center transition-colors"
                   onclick="copyDecryptedText()"
                   title="Copiar texto revelado"
                 >
-                  <span class="material-symbols-outlined text-sm mr-1">content_copy</span>
+                  <span class="material-symbols-outlined text-sm mr-1" aria-hidden="true">content_copy</span>
                   Copiar Texto
                 </button>
                 <button
@@ -324,14 +332,14 @@
                   onclick="document.getElementById('decrypt-output').value += '\n';"
                   title="Nova Linha"
                 >
-                  <span class="material-symbols-outlined text-sm mr-1">keyboard_return</span>
+                  <span class="material-symbols-outlined text-sm mr-1" aria-hidden="true">keyboard_return</span>
                   Nova Linha
                 </button>
                 <button
                   class="text-xs text-slate-400 hover:text-white uppercase flex items-center transition-colors"
                   onclick="document.getElementById('decrypt-output').value = document.getElementById('decrypt-output').value.slice(0, -1);"
                 >
-                  <span class="material-symbols-outlined text-sm mr-1"
+                  <span class="material-symbols-outlined text-sm mr-1" aria-hidden="true"
                     >backspace</span
                   >
                   Apagar Última
@@ -358,7 +366,7 @@
               id="btn-hints"
             >
               <span
-                class="material-symbols-outlined text-amber-500"
+                class="material-symbols-outlined text-amber-500" aria-hidden="true"
                 id="icon-hints"
                 >visibility</span
               >
@@ -393,7 +401,7 @@
             <h2
               class="text-2xl text-amber-500 mb-4 cartier-font border-b border-slate-600 pb-2 flex items-center"
             >
-              <span class="material-symbols-outlined mr-2">translate</span>
+              <span class="material-symbols-outlined mr-2" aria-hidden="true">translate</span>
               Dicionário Musical
             </h2>
             <p class="text-slate-300 mb-4 text-sm leading-relaxed">
@@ -459,7 +467,7 @@
             <h2
               class="text-2xl text-amber-500 mb-4 cartier-font border-b border-slate-600 pb-2 flex items-center"
             >
-              <span class="material-symbols-outlined mr-2">library_music</span>
+              <span class="material-symbols-outlined mr-2" aria-hidden="true">library_music</span>
               Sintaxe & Regras
             </h2>
 
@@ -530,7 +538,7 @@
           class="mt-6 bg-slate-800/90 rounded-xl p-6 border border-slate-700 shadow-lg"
         >
           <h3 class="text-lg text-white font-bold mb-4 flex items-center">
-            <span class="material-symbols-outlined mr-2">grid_view</span> Tabela
+            <span class="material-symbols-outlined mr-2" aria-hidden="true">grid_view</span> Tabela
             de Tradução Completa
           </h3>
           <div

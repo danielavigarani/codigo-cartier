@@ -434,6 +434,7 @@ function generateKeyboard() {
     const letter = reverseMap[note];
     const btn = document.createElement("button");
     btn.className = "note-key flex-shrink-0 flex flex-col justify-center items-center m-0.5 rounded-md shadow-lg border-b-4 focus:outline-none white-key-style w-9 h-20 sm:w-12 sm:h-28 md:w-14 md:h-32 transition-all";
+    btn.setAttribute("aria-label", `Nota ${note}, Letra ${letter}`);
     btn.innerHTML = `<span class="font-bold text-lg mb-2 z-10 text-slate-800">${note}</span><span class="hint-text text-sm font-bold text-amber-600 opacity-60 font-mono border-t border-slate-300 pt-2 w-full text-center transition-opacity">${letter}</span>`;
     btn.onclick = () => {
       playNote(note);
