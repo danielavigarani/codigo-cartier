@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    background-color: #060814;
+    color: #e2e8f0;
+    overflow-x: hidden;
+  }
+}
+
+/* Scrollbar customizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.7);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.55);
+}
+
+/* Modo Sigilo para Stream / Compartilhamento */
+.secret-mode {
+  filter: blur(6px);
+  transition: filter 0.3s ease;
+  cursor: text;
+}
+
+.secret-mode:focus {
+  filter: blur(5px);
+}
+
+.secret-output .decrypted-hint {
+  opacity: 0 !important;
+  filter: blur(8px);
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.secret-score-mask {
+  filter: blur(9px) brightness(0.65);
+  transition: filter 0.35s ease;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Cursor luminoso na partitura VexFlow */
+.vf-note-active path,
+.vf-note-active ellipse,
+.vf-note-active rect {
+  transition: fill 0.12s ease, stroke 0.12s ease, filter 0.12s ease;
+}
+
+.theme-lua .vf-note-active path,
+.theme-lua .vf-note-active ellipse {
+  fill: #67e8f9 !important;
+  stroke: #67e8f9 !important;
+  filter: drop-shadow(0 0 6px rgba(103, 232, 249, 0.9));
+}
+
+.theme-sol .vf-note-active path,
+.theme-sol .vf-note-active ellipse {
+  fill: #fbbf24 !important;
+  stroke: #fbbf24 !important;
+  filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.9));
+}
+
+.theme-eclipse .vf-note-active path,
+.theme-eclipse .vf-note-active ellipse {
+  fill: #e879f9 !important;
+  stroke: #fbbf24 !important;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.95));
+}
