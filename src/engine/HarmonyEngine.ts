@@ -321,7 +321,8 @@ export function harmonizeMeasures(
 function buildArpeggioNotes(
   chord: ChordAnalysis,
   mode: MusicalMode,
-  beatsInMeasure: number
+  beatsInMeasure: number,
+  isHarp = false
 ): Array<{ note: string; beatOffset: number; beats: number }> {
   const root = chord.root;
   const third = chord.notes[1] ?? chord.root;
@@ -331,15 +332,21 @@ function buildArpeggioNotes(
   const f2 = `${fifth}2`;
   const r3 = `${root}3`;
   const t3 = `${third}3`;
+  const f3 = `${fifth}3`;
+  const r4 = `${root}4`;
 
-  const rawPattern = [r2, f2, r3, t3, r3, f2, t3, r3];
+  // Harpa de concerto tece arpejos amplos cruzando duas oitavas; piano faz noturno grave
+  const rawPattern = isHarp
+    ? [r2, f2, r3, t3, f3, r4, f3, t3]
+    : [r2, f2, r3, t3, r3, f2, t3, r3];
   const steps = beatsInMeasure * 2; // colcheias por compasso (8 em 4/4, 6 em 3/4)
   const items: Array<{ note: string; beatOffset: number; beats: number }> = [];
 
   for (let i = 0; i < steps; i++) {
     const candidate = rawPattern[i % rawPattern.length];
     const midi = Note.midi(candidate) ?? 48;
-    const clampedMidi = Math.max(45, Math.min(64, midi)); // A2..E4
+    const maxAllowed = isHarp ? 76 : 64; // E5 na harpa, E4 no piano noturno
+    const clampedMidi = Math.max(45, Math.min(maxAllowed, midi));
     const formatted =
       mode === "sol"
         ? Note.fromMidiSharps(clampedMidi)
@@ -521,12 +528,17 @@ export function buildPlaybackTimeline(
         const measureDurSec = measure.totalBeats * secondsPerBeat;
 
         if (orchestration === "noturno") {
-          const arp = buildArpeggioNotes(chord, mode, measure.totalBeats);
+          const arp = buildArpeggioNotes(
+            chord,
+            mode,
+            measure.totalBeats,
+            voice === "harp"
+          );
           arp.forEach((step, stepIdx) => {
             const vel = getDeterministicVelocity(
               codeHash,
               measure.measureIndex * 16 + stepIdx,
-              0.36,
+              voice === "harp" ? 0.34 : 0.36,
               0.04
             );
             accompanimentEvents.push({
@@ -536,7 +548,7 @@ export function buildPlaybackTimeline(
               cipherNote: step.note,
               soundingNote: step.note,
               startTimeSeconds: measureStart + step.beatOffset * secondsPerBeat,
-              durationSeconds: step.beats * secondsPerBeat * 1.4,
+              durationSeconds: step.beats * secondsPerBeat * 1.45,
               velocity: vel,
               lineIndex: measure.lineIndex,
               measureIndex: measure.measureIndex,
@@ -545,24 +557,54 @@ export function buildPlaybackTimeline(
             });
           });
         } else if (orchestration === "sinfonia") {
-          // Sinfonia de Câmara: Piano + Violoncelo juntos sem competir com a melodia
+          // Sinfonia de Câmara: Piano + Harpa Astral juntos sem competir com a melodia
           const partnerVoice: InstrumentVoice =
-            voice === "piano" ? "cello" : "piano";
+            voice === "piano" ? "harp" : "piano";
 
-          if (partnerVoice === "cello") {
-            // Violoncelo faz baixo sustentado + contracanto simples dentro do acorde
+          if (partnerVoice === "harp") {
+            // Harpa Astral tece arpejos cristalinos amplos dentro do acorde
+            const harpArp = buildArpeggioNotes(
+              chord,
+              mode,
+              measure.totalBeats,
+              true
+            );
+            harpArp.forEach((step, stepIdx) => {
+              const vel = getDeterministicVelocity(
+                codeHash,
+                measure.measureIndex * 16 + stepIdx,
+                0.36,
+                0.04
+              );
+              accompanimentEvents.push({
+                id: `sinf-harp-L${measure.lineIndex}-M${measure.measureIndex}-${stepIdx}`,
+                eventId: `acc-harp-${measure.lineIndex}-${measure.measureIndex}-${stepIdx}`,
+                voice: "harp",
+                cipherNote: step.note,
+                soundingNote: step.note,
+                startTimeSeconds:
+                  measureStart + step.beatOffset * secondsPerBeat,
+                durationSeconds: step.beats * secondsPerBeat * 1.55,
+                velocity: vel,
+                lineIndex: measure.lineIndex,
+                measureIndex: measure.measureIndex,
+                revealTextSoFar: "",
+                isMelody: false,
+              });
+            });
+          } else {
+            // Quando melodia está na Harpa, Piano sustenta o baixo grave + noturno discreto
             const bassNote = chord.bassNote;
-            const fifthNote = `${chord.notes[2] ?? chord.root}3`;
             const velBass = getDeterministicVelocity(
               codeHash,
               measure.measureIndex * 10,
-              0.44,
+              0.42,
               0.04
             );
             accompanimentEvents.push({
-              id: `sinf-cello-bass-L${measure.lineIndex}-M${measure.measureIndex}`,
-              eventId: `acc-cello-b-${measure.lineIndex}-${measure.measureIndex}`,
-              voice: "cello",
+              id: `sinf-piano-bass-L${measure.lineIndex}-M${measure.measureIndex}`,
+              eventId: `acc-piano-b-${measure.lineIndex}-${measure.measureIndex}`,
+              voice: "piano",
               cipherNote: bassNote,
               soundingNote: bassNote,
               startTimeSeconds: measureStart,
@@ -573,31 +615,19 @@ export function buildPlaybackTimeline(
               revealTextSoFar: "",
               isMelody: false,
             });
-            // Contracanto discreto na metade do compasso
-            accompanimentEvents.push({
-              id: `sinf-cello-cnt-L${measure.lineIndex}-M${measure.measureIndex}`,
-              eventId: `acc-cello-c-${measure.lineIndex}-${measure.measureIndex}`,
-              voice: "cello",
-              cipherNote: fifthNote,
-              soundingNote: fifthNote,
-              startTimeSeconds:
-                measureStart + Math.floor(measure.totalBeats / 2) * secondsPerBeat,
-              durationSeconds: (measure.totalBeats / 2) * secondsPerBeat * 0.85,
-              velocity: velBass * 0.85,
-              lineIndex: measure.lineIndex,
-              measureIndex: measure.measureIndex,
-              revealTextSoFar: "",
-              isMelody: false,
-            });
-          } else {
-            // Quando melodia está no violoncelo, piano faz arpejo noturno suave de câmara
-            const arp = buildArpeggioNotes(chord, mode, measure.totalBeats);
+
+            const arp = buildArpeggioNotes(
+              chord,
+              mode,
+              measure.totalBeats,
+              false
+            );
             arp.forEach((step, stepIdx) => {
               const vel = getDeterministicVelocity(
                 codeHash,
                 measure.measureIndex * 16 + stepIdx,
-                0.34,
-                0.04
+                0.3,
+                0.03
               );
               accompanimentEvents.push({
                 id: `sinf-piano-L${measure.lineIndex}-M${measure.measureIndex}-${stepIdx}`,

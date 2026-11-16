@@ -1,6 +1,5 @@
 import { Note } from "tonal";
 import { describe, expect, it } from "vitest";
-import { toImposingCelloRegister } from "../src/engine/AudioEngine";
 import { decodeCipher, encodeText } from "../src/engine/cipher";
 import {
   buildPlaybackTimeline,
@@ -143,21 +142,20 @@ describe("Código Cartier — Motor Rítmico, Harmônico e Semente Determinísti
     });
     expect(sinfoniaLua.accompanimentEvents.length).toBeGreaterThan(0);
     expect(
-      sinfoniaLua.accompanimentEvents.every((ev) => ev.voice === "cello")
+      sinfoniaLua.accompanimentEvents.every((ev) => ev.voice === "harp")
     ).toBe(true);
-  });
 
-  it("conduz o violoncelo para o registro grave/barítono imponente (C2–B3) preservando a classe da nota", () => {
-    const highSharp = toImposingCelloRegister("C#5");
-    expect(highSharp.mainNote).toBe("C#3");
-    expect(highSharp.subBassNote).toBe("C#2");
-
-    const veryHigh = toImposingCelloRegister("E6");
-    expect(veryHigh.mainNote).toBe("E3");
-    expect(veryHigh.subBassNote).toBe("E2");
-
-    const lowA = toImposingCelloRegister("A2");
-    expect(lowA.mainNote).toBe("A2");
-    expect(lowA.subBassNote).toBeNull();
+    const sinfoniaSol = buildPlaybackTimeline({
+      measuresByLine,
+      mode: "sol",
+      voice: "harp",
+      orchestration: "sinfonia",
+      fidelity: "fiel",
+      tempo: "andante",
+    });
+    expect(sinfoniaSol.accompanimentEvents.length).toBeGreaterThan(0);
+    expect(
+      sinfoniaSol.accompanimentEvents.every((ev) => ev.voice === "piano")
+    ).toBe(true);
   });
 });

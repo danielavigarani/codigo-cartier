@@ -111,24 +111,38 @@ function ObservatoryShell() {
       style={{ backgroundColor: bgColor }}
     >
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-        <img
-          alt=""
-          src="./background.svg"
-          className="w-full h-full object-cover opacity-15"
-        />
+        {/* Camada atmosférica profunda por tema (Lua / Sol / Eclipse) */}
         <motion.div
           animate={{
-            opacity: effectiveTheme === "sol" ? 0.5 : 0.35,
+            opacity: effectiveTheme === "sol" ? 0.92 : 0.85,
           }}
           transition={{ duration: reducedMotion ? 0 : 0.8 }}
           className="absolute inset-0"
           style={{
             background:
               effectiveTheme === "sol"
-                ? "radial-gradient(circle at 50% 0%, rgba(212,175,55,0.22), transparent 62%), radial-gradient(circle at 80% 80%, rgba(180,83,9,0.12), transparent 55%)"
+                ? "radial-gradient(ellipse at 50% 10%, rgba(212,175,55,0.22), transparent 58%), radial-gradient(circle at 82% 78%, rgba(180,83,9,0.16), transparent 50%), radial-gradient(circle at 15% 85%, rgba(120,53,15,0.14), transparent 48%)"
                 : effectiveTheme === "eclipse"
-                ? "radial-gradient(circle at 50% 0%, rgba(212,175,55,0.20), rgba(103,232,249,0.12) 45%, transparent 72%)"
-                : "radial-gradient(circle at 50% 0%, rgba(103,232,249,0.16), rgba(30,58,138,0.20) 45%, transparent 72%)",
+                ? "radial-gradient(ellipse at 50% 12%, rgba(212,175,55,0.20), rgba(139,92,246,0.16) 36%, transparent 66%), radial-gradient(circle at 20% 80%, rgba(103,232,249,0.12), transparent 50%)"
+                : "radial-gradient(ellipse at 50% 10%, rgba(103,232,249,0.16), rgba(30,58,138,0.22) 42%, transparent 68%), radial-gradient(circle at 85% 82%, rgba(99,102,241,0.12), transparent 50%)",
+          }}
+        />
+
+        {/* Gravura astronômica e pentagramas celestes */}
+        <img
+          alt=""
+          src="./background.svg"
+          className={`w-full h-full object-cover mix-blend-screen transition-opacity duration-700 ${
+            effectiveTheme === "sol" ? "opacity-55" : "opacity-65"
+          }`}
+        />
+
+        {/* Vinheta sutil para preservar legibilidade dos cartões */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(circle at 50% 45%, transparent 45%, rgba(4, 6, 15, 0.72) 100%)",
           }}
         />
       </div>

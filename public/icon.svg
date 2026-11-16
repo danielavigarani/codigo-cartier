@@ -1,7 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <rect width="128" height="128" rx="28" fill="#060814"/>
-  <circle cx="64" cy="64" r="46" fill="none" stroke="#D4AF37" stroke-width="3" stroke-dasharray="6 4"/>
-  <circle cx="64" cy="64" r="32" fill="#D4AF37" opacity="0.22"/>
-  <path d="M72 34 A30 30 0 1 0 88 86 A22 22 0 1 1 72 34 Z" fill="#CBD5E1" stroke="#67E8F9" stroke-width="2"/>
-  <circle cx="88" cy="44" r="4" fill="#FBBF24"/>
+  <defs>
+    <radialGradient id="favBg" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#141C3A"/>
+      <stop offset="100%" stop-color="#050711"/>
+    </radialGradient>
+    <linearGradient id="favGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE68A"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#92400E"/>
+    </linearGradient>
+    <linearGradient id="favSilver" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#67E8F9"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="128" height="128" rx="28" fill="url(#favBg)"/>
+  <circle cx="64" cy="64" r="54" fill="none" stroke="url(#favGold)" stroke-width="2.5" stroke-opacity="0.6"/>
+  <circle cx="64" cy="64" r="45" fill="none" stroke="#CBD5E1" stroke-width="1.2" stroke-dasharray="4 4" stroke-opacity="0.5"/>
+
+  <!-- Coroa Solar do Eclipse -->
+  <circle cx="68" cy="62" r="28" fill="#D4AF37" fill-opacity="0.22" stroke="url(#favGold)" stroke-width="2.5"/>
+
+  <!-- Lua Crescente Prateada -->
+  <path d="M74 32 A30 30 0 1 0 92 84 A23 23 0 1 1 74 32 Z" fill="url(#favSilver)"/>
+
+  <!-- Nota Musical Dourada no centro do Eclipse -->
+  <g fill="url(#favGold)">
+    <ellipse cx="64" cy="75" rx="9" ry="6.5" transform="rotate(-20 64 75)"/>
+    <rect x="70.5" y="42" width="4" height="33" rx="2"/>
+    <path d="M74.5 42 C85 45 90 54 84 63 C84 55 80 51 74.5 49 Z"/>
+  </g>
+
+  <!-- Estrela guia -->
+  <path d="M96 26 L98 32 L104 34 L98 36 L96 42 L94 36 L88 34 L94 32 Z" fill="#FDE68A"/>
 </svg>

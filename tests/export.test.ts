@@ -32,7 +32,7 @@ describe("Código Cartier — Exportação, Compartilhamento & Verificação", (
     const code = encodeText("SEGREDO REAL", {
       version: "v2",
       mode: "sol",
-      voice: "cello",
+      voice: "harp",
       format: "code",
     });
 
@@ -55,7 +55,7 @@ describe("Código Cartier — Exportação, Compartilhamento & Verificação", (
     const code = encodeText("GABRIELA E PRIYA", {
       version: "v2",
       mode: "sol",
-      voice: "cello",
+      voice: "harp",
       format: "code",
     });
     const decoded = decodeCipher(code);
@@ -66,7 +66,7 @@ describe("Código Cartier — Exportação, Compartilhamento & Verificação", (
     const timeline = buildPlaybackTimeline({
       measuresByLine,
       mode: "sol",
-      voice: "cello",
+      voice: "harp",
       orchestration: "sinfonia",
       fidelity: "fiel",
       tempo: "andante",

@@ -41,18 +41,28 @@ const INITIAL_SAMPLE_MESSAGES: DuetMessage[] = [
   {
     id: "duet-seed-2",
     senderName: "Gabriela (Sol)",
-    voice: "cello",
+    voice: "harp",
     mode: "sol",
     rawText: "OUCO TUAS CORDAS",
     cipherCode: encodeText("OUCO TUAS CORDAS", {
       version: "v2",
       mode: "sol",
-      voice: "cello",
+      voice: "harp",
       format: "code",
     }),
     createdAt: new Date().toISOString(),
   },
 ];
+
+function normalizeLoadedMessages(rawList: unknown[]): DuetMessage[] {
+  return rawList.map((item) => {
+    const msg = item as DuetMessage & { voice: string };
+    return {
+      ...msg,
+      voice: msg.voice === "piano" ? "piano" : "harp",
+    };
+  });
+}
 
 function loadSavedMessages(): DuetMessage[] {
   try {
@@ -60,7 +70,7 @@ function loadSavedMessages(): DuetMessage[] {
     if (!raw) return INITIAL_SAMPLE_MESSAGES;
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed;
+      return normalizeLoadedMessages(parsed);
     }
   } catch {
     // ignora
@@ -280,7 +290,7 @@ export function DuetSession() {
       const text = await files[0].text();
       const parsed = JSON.parse(text);
       if (Array.isArray(parsed)) {
-        setMessages(parsed);
+        setMessages(normalizeLoadedMessages(parsed));
         showNotice("Sessão de dueto importada!");
       }
     } catch {
@@ -298,8 +308,8 @@ export function DuetSession() {
               <span>Sessão de Dueto — O Momento do Eclipse</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-300/85 mt-1">
-              Alterne mensagens entre o <strong>Piano Lunar (Priya)</strong> e o{" "}
-              <strong>Violoncelo Solar (Gabriela)</strong> e toque toda a
+              Alterne mensagens entre o <strong>Piano Lunar (Priya)</strong> e a{" "}
+              <strong>Harpa Astral (Gabriela)</strong> e toque toda a
               conversa como uma peça única a duas vozes.
             </p>
           </div>
@@ -308,11 +318,10 @@ export function DuetSession() {
             <button
               type="button"
               onClick={handlePlayDuet}
-              className={`px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg transition-all ${
-                playback.isPlaying
+              className={`px-5 py-2.5 rounded-full font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg transition-all ${playback.isPlaying
                   ? "bg-red-900/60 border border-red-400 text-red-100"
                   : "bg-gradient-to-r from-cyan-600 via-violet-600 to-amber-500 text-white hover:opacity-95"
-              }`}
+                }`}
             >
               {playback.isPlaying ? (
                 <>
@@ -374,13 +383,12 @@ export function DuetSession() {
               return (
                 <div
                   key={msg.id}
-                  className={`rounded-xl p-4 border transition-all ${
-                    isActive
+                  className={`rounded-xl p-4 border transition-all ${isActive
                       ? "ring-2 ring-amber-400 bg-violet-950/50 border-amber-400/70 shadow-lg"
                       : isPiano
-                      ? "bg-[#081024]/75 border-cyan-500/25"
-                      : "bg-[#1c130b]/75 border-amber-500/25"
-                  }`}
+                        ? "bg-[#081024]/75 border-cyan-500/25"
+                        : "bg-[#1c130b]/75 border-amber-500/25"
+                    }`}
                 >
                   <div className="flex items-center justify-between gap-2 mb-2">
                     <div className="flex items-center gap-2 text-xs font-bold">
@@ -395,7 +403,7 @@ export function DuetSession() {
                         }
                       >
                         {msg.senderName} ·{" "}
-                        {isPiano ? "Piano (Lua)" : "Violoncelo (Sol)"}
+                        {isPiano ? "Piano (Lua)" : "Harpa Astral (Sol)"}
                       </span>
                     </div>
 
@@ -432,26 +440,24 @@ export function DuetSession() {
               <button
                 type="button"
                 onClick={() => setSenderVoice("piano")}
-                className={`px-3 py-1.5 rounded-full font-semibold border flex items-center gap-1.5 ${
-                  senderVoice === "piano"
+                className={`px-3 py-1.5 rounded-full font-semibold border flex items-center gap-1.5 ${senderVoice === "piano"
                     ? "bg-cyan-500/20 border-cyan-400 text-cyan-100"
                     : "bg-black/30 border-white/15 text-slate-400"
-                }`}
+                  }`}
               >
                 <Moon className="w-3.5 h-3.5" />
                 <span>Priya · Piano (Lua)</span>
               </button>
               <button
                 type="button"
-                onClick={() => setSenderVoice("cello")}
-                className={`px-3 py-1.5 rounded-full font-semibold border flex items-center gap-1.5 ${
-                  senderVoice === "cello"
+                onClick={() => setSenderVoice("harp")}
+                className={`px-3 py-1.5 rounded-full font-semibold border flex items-center gap-1.5 ${senderVoice === "harp"
                     ? "bg-amber-500/20 border-amber-400 text-amber-100"
                     : "bg-black/30 border-white/15 text-slate-400"
-                }`}
+                  }`}
               >
                 <Sun className="w-3.5 h-3.5" />
-                <span>Gabriela · Violoncelo (Sol)</span>
+                <span>Gabriela · Harpa Astral (Sol)</span>
               </button>
             </div>
 
@@ -459,22 +465,20 @@ export function DuetSession() {
               <button
                 type="button"
                 onClick={() => setInputMode("text")}
-                className={`px-3 py-1 rounded-full font-semibold ${
-                  inputMode === "text"
+                className={`px-3 py-1 rounded-full font-semibold ${inputMode === "text"
                     ? "bg-white/15 text-white"
                     : "text-slate-400"
-                }`}
+                  }`}
               >
                 Texto Livre
               </button>
               <button
                 type="button"
                 onClick={() => setInputMode("cipher")}
-                className={`px-3 py-1 rounded-full font-semibold ${
-                  inputMode === "cipher"
+                className={`px-3 py-1 rounded-full font-semibold ${inputMode === "cipher"
                     ? "bg-white/15 text-white"
                     : "text-slate-400"
-                }`}
+                  }`}
               >
                 Colar Cifra
               </button>

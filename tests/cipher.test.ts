@@ -85,11 +85,11 @@ describe("Código Cartier — Motor de Cifra (v1 & v2)", () => {
     const encoded = encodeText(original, {
       version: "v1",
       mode: "sol",
-      voice: "cello",
+      voice: "harp",
       format: "code",
     });
 
-    expect(encoded.startsWith("#cartier v1 modo=sol voz=cello\n")).toBe(true);
+    expect(encoded.startsWith("#cartier v1 modo=sol voz=harp\n")).toBe(true);
     const decoded = decodeCipher(encoded);
     expect(decoded.detection.version).toBe("v1");
     expect(decoded.decodedText).toBe("CEU AZUL\n\nVOZ ANTIGA");
@@ -108,16 +108,19 @@ describe("Código Cartier — Motor de Cifra (v1 & v2)", () => {
     expect(decoded.hasErrors).toBe(false);
   });
 
-  it("analisa o cabeçalho #cartier corretamente", () => {
-    const headerStr = formatHeader("v2", "sol", "cello");
-    expect(headerStr).toBe("#cartier v2 modo=sol voz=cello");
+  it("analisa o cabeçalho #cartier corretamente e mantém compatibilidade com voz=cello legado", () => {
+    const headerStr = formatHeader("v2", "sol", "harp");
+    expect(headerStr).toBe("#cartier v2 modo=sol voz=harp");
     const parsed = parseHeader(`${headerStr}\nA2 B2`);
     expect(parsed).toEqual({
-      raw: "#cartier v2 modo=sol voz=cello",
+      raw: "#cartier v2 modo=sol voz=harp",
       version: "v2",
       mode: "sol",
-      voice: "cello",
+      voice: "harp",
     });
+
+    const legacyParsed = parseHeader("#cartier v1 modo=sol voz=cello\nA2 B2");
+    expect(legacyParsed.voice).toBe("harp");
   });
 
   it("detecta versão sem cabeçalho usando notas exclusivas e sinaliza ambiguidade", () => {

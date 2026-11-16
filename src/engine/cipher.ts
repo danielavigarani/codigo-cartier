@@ -60,8 +60,11 @@ export function parseHeader(rawCode: string): CipherHeader {
           }
         } else if (lower.startsWith("voz=")) {
           const val = lower.slice(4);
-          if (val === "piano" || val === "cello") {
-            header.voice = val;
+          if (val === "piano") {
+            header.voice = "piano";
+          } else if (val === "harp" || val === "harpa" || val === "cello") {
+            // Compatibilidade retroativa: códigos antigos com voz=cello mapeiam para Harpa
+            header.voice = "harp";
           }
         }
       }
@@ -236,7 +239,7 @@ export function encodeText(
   const {
     version = "v2",
     mode = "lua",
-    voice = mode === "lua" ? "piano" : "cello",
+    voice = mode === "lua" ? "piano" : "harp",
     format = "code",
     includeHeader = format === "code",
   } = options;

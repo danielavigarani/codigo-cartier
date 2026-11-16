@@ -59,7 +59,7 @@ export function PdfScoreModal({
   const { mode, tempo, timeSignature } = useSunMoonTheme();
   const [opusTitle, setOpusTitle] = useState(() => getSuggestedOpus(mode));
   const [subtitle, setSubtitle] = useState(
-    "Manuscrito Criptográfico para Piano & Violoncelo"
+    "Manuscrito Criptográfico para Piano & Harpa de Concerto"
   );
   const [composers, setComposers] = useState("Gabriela & Priya");
   const [paperStyle, setPaperStyle] = useState<PaperStyle>("pergaminho");

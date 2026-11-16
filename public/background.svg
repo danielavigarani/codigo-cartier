@@ -1,1 +1,109 @@
-<svg width="1024" height="1024" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"> <defs> <linearGradient id="g" x1="-100%" y1="0" x2="0" y2="0"> <stop offset="0" stop-color="#b0b0b0"/> <stop offset=".5" stop-color="#f0f0f0"/> <stop offset="1" stop-color="#b0b0b0"/> <animateTransform id="a" attributeName="gradientTransform" type="translate" from="0" to="2" dur="1s" begin="0s"/> <animateTransform id="b" attributeName="gradientTransform" type="translate" from="0" to="2" dur="1.5s" begin="a.end"/> <animateTransform attributeName="gradientTransform" type="translate" from="0" to="2" dur="2s" begin="b.end" repeatCount="indefinite"/> </linearGradient> </defs> <rect width="100" height="100" fill="url(#g)"/> </svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="nebulaGlow" cx="50%" cy="42%" r="55%">
+      <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.14"/>
+      <stop offset="45%" stop-color="#67E8F9" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="staveGold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D4AF37" stop-opacity="0"/>
+      <stop offset="25%" stop-color="#D4AF37" stop-opacity="0.22"/>
+      <stop offset="50%" stop-color="#CBD5E1" stop-opacity="0.28"/>
+      <stop offset="75%" stop-color="#D4AF37" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#D4AF37" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="ringSilver" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#CBD5E1" stop-opacity="0.32"/>
+      <stop offset="50%" stop-color="#D4AF37" stop-opacity="0.36"/>
+      <stop offset="100%" stop-color="#67E8F9" stop-opacity="0.22"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1920" height="1080" fill="url(#nebulaGlow)"/>
+
+  <!-- Pentagramas musicais celestes atravessando o observatório -->
+  <g fill="none" stroke="url(#staveGold)" stroke-width="1">
+    <path d="M 0 360 Q 480 280, 960 360 T 1920 340"/>
+    <path d="M 0 376 Q 480 296, 960 376 T 1920 356"/>
+    <path d="M 0 392 Q 480 312, 960 392 T 1920 372"/>
+    <path d="M 0 408 Q 480 328, 960 408 T 1920 388"/>
+    <path d="M 0 424 Q 480 344, 960 424 T 1920 404"/>
+
+    <path d="M 0 720 Q 480 800, 960 720 T 1920 740" stroke-opacity="0.65"/>
+    <path d="M 0 736 Q 480 816, 960 736 T 1920 756" stroke-opacity="0.65"/>
+    <path d="M 0 752 Q 480 832, 960 752 T 1920 772" stroke-opacity="0.65"/>
+    <path d="M 0 768 Q 480 848, 960 768 T 1920 788" stroke-opacity="0.65"/>
+    <path d="M 0 784 Q 480 864, 960 784 T 1920 804" stroke-opacity="0.65"/>
+  </g>
+
+  <!-- Astrolábio Monumental Central -->
+  <g transform="translate(960 460)" fill="none">
+    <circle r="480" stroke="url(#ringSilver)" stroke-width="1" stroke-dasharray="3 9" stroke-opacity="0.45"/>
+    <circle r="430" stroke="#D4AF37" stroke-width="1.2" stroke-opacity="0.22"/>
+    <circle r="365" stroke="#CBD5E1" stroke-width="0.9" stroke-dasharray="14 6 2 6" stroke-opacity="0.28"/>
+    <circle r="290" stroke="#D4AF37" stroke-width="1" stroke-opacity="0.26"/>
+    <circle r="210" stroke="#67E8F9" stroke-width="0.8" stroke-dasharray="2 8" stroke-opacity="0.32"/>
+
+    <!-- Órbitas elípticas inclinadas -->
+    <ellipse rx="460" ry="175" stroke="#D4AF37" stroke-width="0.9" stroke-opacity="0.24" transform="rotate(-22)"/>
+    <ellipse rx="460" ry="175" stroke="#CBD5E1" stroke-width="0.9" stroke-opacity="0.22" transform="rotate(22)"/>
+    <ellipse rx="340" ry="120" stroke="#67E8F9" stroke-width="0.8" stroke-opacity="0.2" transform="rotate(64)"/>
+
+    <!-- Eixos cardinais e diagonais -->
+    <line x1="-520" y1="0" x2="520" y2="0" stroke="#CBD5E1" stroke-width="0.7" stroke-opacity="0.18"/>
+    <line x1="0" y1="-520" x2="0" y2="520" stroke="#CBD5E1" stroke-width="0.7" stroke-opacity="0.18"/>
+    <line x1="-360" y1="-360" x2="360" y2="360" stroke="#D4AF37" stroke-width="0.6" stroke-opacity="0.14"/>
+    <line x1="-360" y1="360" x2="360" y2="-360" stroke="#D4AF37" stroke-width="0.6" stroke-opacity="0.14"/>
+
+    <!-- Marcações cardinais nos anéis -->
+    <circle cx="0" cy="-430" r="4" fill="#D4AF37" fill-opacity="0.45"/>
+    <circle cx="430" cy="0" r="4" fill="#CBD5E1" fill-opacity="0.45"/>
+    <circle cx="0" cy="430" r="4" fill="#D4AF37" fill-opacity="0.45"/>
+    <circle cx="-430" cy="0" r="4" fill="#CBD5E1" fill-opacity="0.45"/>
+  </g>
+
+  <!-- Constelação da Lira / Lua (Esquerda) -->
+  <g stroke="#67E8F9" stroke-width="0.8" stroke-opacity="0.28" stroke-dasharray="4 5" fill="none">
+    <polyline points="180,220 265,165 340,240 290,335 205,310 180,220"/>
+    <polyline points="115,690 210,635 315,675 275,785 160,815"/>
+  </g>
+
+  <!-- Constelação Solar (Direita) -->
+  <g stroke="#D4AF37" stroke-width="0.8" stroke-opacity="0.28" stroke-dasharray="4 5" fill="none">
+    <polyline points="1540,210 1630,150 1720,205 1685,305 1575,295 1540,210"/>
+    <polyline points="1590,695 1690,640 1795,695 1745,810 1625,790"/>
+  </g>
+
+  <!-- Estrelas de 4 pontas e campo estelar discreto -->
+  <g fill="#E2E8F0">
+    <path d="M 265 155 L 267 163 L 275 165 L 267 167 L 265 175 L 263 167 L 255 165 L 263 163 Z" opacity="0.55"/>
+    <path d="M 1630 140 L 1632 148 L 1640 150 L 1632 152 L 1630 160 L 1628 152 L 1620 150 L 1628 148 Z" fill="#FDE68A" opacity="0.6"/>
+    <path d="M 1390 410 L 1391.5 416 L 1397.5 417.5 L 1391.5 419 L 1390 425 L 1388.5 419 L 1382.5 417.5 L 1388.5 416 Z" opacity="0.45"/>
+    <path d="M 520 520 L 521.5 526 L 527.5 527.5 L 521.5 529 L 520 535 L 518.5 529 L 512.5 527.5 L 518.5 526 Z" fill="#67E8F9" opacity="0.45"/>
+    <path d="M 1795 685 L 1797 693 L 1805 695 L 1797 697 L 1795 705 L 1793 697 L 1785 695 L 1793 693 Z" fill="#FDE68A" opacity="0.5"/>
+    <path d="M 210 625 L 212 633 L 220 635 L 212 637 L 210 645 L 208 637 L 200 635 L 208 633 Z" opacity="0.5"/>
+
+    <circle cx="180" cy="220" r="2.2" opacity="0.45"/>
+    <circle cx="340" cy="240" r="2" opacity="0.4"/>
+    <circle cx="290" cy="335" r="1.8" opacity="0.35"/>
+    <circle cx="205" cy="310" r="1.6" opacity="0.35"/>
+    <circle cx="1540" cy="210" r="2.2" fill="#FDE68A" opacity="0.45"/>
+    <circle cx="1720" cy="205" r="2" fill="#FDE68A" opacity="0.4"/>
+    <circle cx="1685" cy="305" r="1.8" fill="#FDE68A" opacity="0.35"/>
+    <circle cx="1575" cy="295" r="1.6" opacity="0.35"/>
+    <circle cx="420" cy="145" r="1.4" opacity="0.35"/>
+    <circle cx="640" cy="180" r="1.2" opacity="0.3"/>
+    <circle cx="1280" cy="165" r="1.3" fill="#FDE68A" opacity="0.35"/>
+    <circle cx="1440" cy="120" r="1.5" opacity="0.35"/>
+    <circle cx="115" cy="690" r="2" opacity="0.4"/>
+    <circle cx="315" cy="675" r="1.8" opacity="0.35"/>
+    <circle cx="275" cy="785" r="2.2" opacity="0.4"/>
+    <circle cx="160" cy="815" r="1.6" opacity="0.3"/>
+    <circle cx="1590" cy="695" r="2" fill="#FDE68A" opacity="0.4"/>
+    <circle cx="1690" cy="640" r="2.2" fill="#FDE68A" opacity="0.45"/>
+    <circle cx="1745" cy="810" r="1.8" opacity="0.35"/>
+    <circle cx="1625" cy="790" r="1.6" opacity="0.3"/>
+    <circle cx="710" cy="885" r="1.4" opacity="0.3"/>
+    <circle cx="1220" cy="895" r="1.6" fill="#FDE68A" opacity="0.32"/>
+  </g>
+</svg>

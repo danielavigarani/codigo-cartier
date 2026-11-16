@@ -78,6 +78,7 @@ interface SunMoonThemeContextValue {
     modeOverride?: MusicalMode,
     explicitSounding?: string
   ) => void;
+  playGlissando: () => void;
 }
 
 const SunMoonThemeContext = createContext<SunMoonThemeContextValue | null>(
@@ -85,7 +86,7 @@ const SunMoonThemeContext = createContext<SunMoonThemeContextValue | null>(
 );
 
 export function SunMoonThemeProvider({ children }: { children: ReactNode }) {
-  // Padrão confirmado: Lua = Piano, Sol = Violoncelo
+  // Padrão confirmado: Lua = Piano, Sol = Harpa de Concerto
   const [mode, setModeState] = useState<MusicalMode>("lua");
   const [manualTheme, setManualThemeState] = useState<"auto" | SunMoonMode>(
     "auto"
@@ -133,8 +134,8 @@ export function SunMoonThemeProvider({ children }: { children: ReactNode }) {
     (nextMode: MusicalMode) => {
       stopPlayback();
       setModeState(nextMode);
-      // Associação oficial: Lua -> Piano, Sol -> Violoncelo
-      setVoiceState(nextMode === "lua" ? "piano" : "cello");
+      // Associação oficial: Lua -> Piano, Sol -> Harpa de Concerto
+      setVoiceState(nextMode === "lua" ? "piano" : "harp");
       audioEngine.setModeTimbre(nextMode);
     },
     [stopPlayback]
@@ -273,6 +274,11 @@ export function SunMoonThemeProvider({ children }: { children: ReactNode }) {
     [mode, voice]
   );
 
+  const playGlissando = useCallback(() => {
+    if (!audioEngine.isReady()) return;
+    audioEngine.playHarpGlissando(mode);
+  }, [mode]);
+
   const visualTheme: SunMoonMode = useMemo(() => {
     if (manualTheme !== "auto") return manualTheme;
     if (
@@ -330,6 +336,7 @@ export function SunMoonThemeProvider({ children }: { children: ReactNode }) {
     stopPlayback,
     playTimeline,
     playSingleCipherNote,
+    playGlissando,
   };
 
   return (

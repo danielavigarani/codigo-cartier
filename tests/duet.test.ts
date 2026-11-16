@@ -4,7 +4,7 @@ import { encodeText } from "../src/engine/cipher";
 import type { DuetMessage } from "../src/types/music";
 
 describe("Código Cartier — Sessão / Dueto (Eclipse)", () => {
-  it("concatena falas em Piano (Lua) e Violoncelo (Sol) em sequência sem sobreposição", () => {
+  it("concatena falas em Piano (Lua) e Harpa Astral (Sol) em sequência sem sobreposição", () => {
     const messages: DuetMessage[] = [
       {
         id: "m1",
@@ -23,13 +23,13 @@ describe("Código Cartier — Sessão / Dueto (Eclipse)", () => {
       {
         id: "m2",
         senderName: "Gabriela (Sol)",
-        voice: "cello",
+        voice: "harp",
         mode: "sol",
         rawText: "SOL",
         cipherCode: encodeText("SOL", {
           version: "v2",
           mode: "sol",
-          voice: "cello",
+          voice: "harp",
           format: "code",
         }),
         createdAt: "2026-01-01T00:01:00Z",
@@ -50,10 +50,10 @@ describe("Código Cartier — Sessão / Dueto (Eclipse)", () => {
     const pianoAudible = timeline.melodyEvents.filter(
       (e) => e.voice === "piano" && e.isMelody && e.soundingNote !== ""
     );
-    const celloAudible = timeline.melodyEvents.filter(
-      (e) => e.voice === "cello" && e.isMelody && e.soundingNote !== ""
+    const harpAudible = timeline.melodyEvents.filter(
+      (e) => e.voice === "harp" && e.isMelody && e.soundingNote !== ""
     );
     expect(pianoAudible.length).toBe(3); // L U A (sem duplo ataque em ligaduras)
-    expect(celloAudible.length).toBe(3); // S O L
+    expect(harpAudible.length).toBe(3); // S O L
   });
 });

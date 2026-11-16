@@ -263,7 +263,7 @@ function AstrolabeEmblem() {
           }`}
         >
           <Sun className="w-3.5 h-3.5" />
-          <span>Sol · Violoncelo</span>
+          <span>Sol · Harpa</span>
         </button>
       </div>
     </div>
@@ -296,6 +296,7 @@ export function EclipseHeader() {
     setVolume,
     toggleReducedMotion,
     initAudio,
+    playGlissando,
   } = useSunMoonTheme();
 
   const isSol = visualTheme === "sol";
@@ -341,7 +342,7 @@ export function EclipseHeader() {
             "Onde as palavras falham, a música fala." —{" "}
             {mode === "lua"
               ? "Modo Lua (Lá Menor Natural · Piano de Priya)"
-              : "Modo Sol (Lá Maior 3# · Violoncelo de Gabriela)"}
+              : "Modo Sol (Lá Maior 3# · Harpa Astral de Gabriela)"}
           </p>
         </div>
       </div>
@@ -381,7 +382,7 @@ export function EclipseHeader() {
             </div>
           ) : (
             <p className="text-xs text-slate-400 mt-2">
-              (Clique para ativar os samples locais de Piano e Violoncelo)
+              (Clique para ativar os samples locais de Piano e Harpa Astral)
             </p>
           )}
         </div>
@@ -392,7 +393,7 @@ export function EclipseHeader() {
             <div className="relative bg-black/45 rounded-full p-1 border border-white/15 shadow-lg flex w-full max-w-[360px] h-14">
               <div
                 className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-full transition-transform duration-300 ease-out shadow-md z-0 ${
-                  voice === "cello"
+                  voice === "harp"
                     ? "translate-x-full bg-gradient-to-r from-amber-700 to-amber-500"
                     : "translate-x-0 bg-gradient-to-r from-slate-700 to-cyan-700"
                 }`}
@@ -411,15 +412,15 @@ export function EclipseHeader() {
               </button>
               <button
                 type="button"
-                onClick={() => setVoice("cello")}
+                onClick={() => setVoice("harp")}
                 className={`relative z-10 w-1/2 h-full rounded-full flex flex-col justify-center items-center leading-tight transition-colors ${
-                  voice === "cello"
+                  voice === "harp"
                     ? "text-white"
                     : "text-slate-400 hover:text-white"
                 }`}
               >
-                <span className="text-sm font-bold">Violoncelo</span>
-                <span className="text-[10px] opacity-85">Sol · Emoção</span>
+                <span className="text-sm font-bold">Harpa Astral</span>
+                <span className="text-[10px] opacity-85">Sol · Ressonância</span>
               </button>
             </div>
 
@@ -569,7 +570,7 @@ export function EclipseHeader() {
               )}
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 pr-2 border-r border-white/10">
               {(["4/4", "3/4"] as TimeSignature[]).map((sig) => (
                 <button
                   key={sig}
@@ -585,6 +586,16 @@ export function EclipseHeader() {
                 </button>
               ))}
             </div>
+
+            <button
+              type="button"
+              onClick={playGlissando}
+              title="Tocar glissando celestial na Harpa Astral"
+              className="px-3 py-1 rounded-full font-semibold bg-amber-500/15 hover:bg-amber-500/30 border border-amber-400/40 text-amber-200 flex items-center gap-1 transition-colors"
+            >
+              <Sparkles className="w-3 h-3" />
+              <span>Glissando Astral</span>
+            </button>
           </div>
 
           {fidelity === "suave" && (

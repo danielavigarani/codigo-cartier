@@ -80,7 +80,7 @@ export function TheoryGrimoire() {
 
     const instrumentDesc = isPiano
       ? "dedilhada no piano antigo de teclas frias"
-      : "arrancada das cordas graves do violoncelo em madeira envelhecida";
+      : "arrancada das cordas douradas da harpa de concerto em madeira nobre";
 
     const modeDesc = isMoon
       ? "em Lá Menor Natural — apenas teclas brancas, sem redenção nem sustenidos"
@@ -88,9 +88,9 @@ export function TheoryGrimoire() {
 
     const orchDesc =
       orchestration === "sinfonia"
-        ? "As duas primas respondem uma à outra no instante exato do Eclipse, entrelaçando piano e violoncelo."
+        ? "As duas primas respondem uma à outra no instante exato do Eclipse, entrelaçando piano e harpa astral."
         : orchestration === "noturno"
-        ? "Um baixo contínuo noturno sustenta cada sílaba como ondas sob um cais de neblina."
+        ? "Um arpejo noturno contínuo sustenta cada sílaba como ondas sob um cais de neblina."
         : "A melodia ressoa solitária, nua e direta, para quem ousa decifrar nota por nota.";
 
     const endings = [
@@ -237,6 +237,19 @@ export function TheoryGrimoire() {
                 de palavra = nota pontuada, <code>|</code> = pausa de colcheia (
                 <code>8r</code>), fim de linha = mínima pontuada (
                 <code>2n.</code>) + cadência.
+              </p>
+            </div>
+
+            <div className="bg-black/35 p-3.5 rounded-xl border border-white/10">
+              <h4 className="font-bold text-white mb-1">
+                4. Harpa Astral & Piano (Extensão Completa A2–E6)
+              </h4>
+              <p className="leading-relaxed text-slate-300/90">
+                Tanto o <strong>Piano Lunar</strong> quanto a{" "}
+                <strong>Harpa de Concerto (Harpa Astral)</strong> cobrem toda a
+                extensão da cifra (<code>A2–E6</code>) com cordas reais na
+                altura escrita, sem perda de ataque em notas rápidas e com
+                arpejos amplos nos modos Noturno e Sinfonia de Câmara.
               </p>
             </div>
 

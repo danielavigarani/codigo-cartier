@@ -1,5 +1,4 @@
 import * as Tone from "tone";
-import { Note } from "tonal";
 import type {
   InstrumentVoice,
   MusicalMode,
@@ -25,72 +24,31 @@ const PIANO_SAMPLE_URLS: Record<string, string> = {
   "D#6": "Ds6.mp3",
 };
 
-const CELLO_SAMPLE_URLS: Record<string, string> = {
-  C2: "C2.mp3",
-  D2: "D2.mp3",
-  E2: "E2.mp3",
-  F2: "F2.mp3",
-  G2: "G2.mp3",
-  "G#2": "Gs2.mp3",
-  A2: "A2.mp3",
-  "A#2": "As2.mp3",
-  C3: "C3.mp3",
-  D3: "D3.mp3",
-  "D#3": "Ds3.mp3",
-  E3: "E3.mp3",
-  F3: "F3.mp3",
-  "F#3": "Fs3.mp3",
-  G3: "G3.mp3",
-  "G#3": "Gs3.mp3",
-  A3: "A3.mp3",
-  "A#3": "As3.mp3",
-  B3: "B3.mp3",
-  C4: "C4.mp3",
-  D4: "D4.mp3",
-  "D#4": "Ds4.mp3",
-  E4: "E4.mp3",
-  F4: "F4.mp3",
-  "F#4": "Fs4.mp3",
-  G4: "G4.mp3",
-  "G#4": "Gs4.mp3",
-  A4: "A4.mp3",
-  B4: "B4.mp3",
-  C5: "C5.mp3",
-};
-
 /**
- * Conduz notas agudas (>= C4) para a tessitura barítono/tenor imponente do violoncelo (C2–B3),
- * preservando exatamente a classe de altura (C..B, com sustenidos quando houver) e retornando
- * uma sub-oitava opcional (-12 semitons) para corpo sinfônico.
+ * Harpa de Concerto (Harpa Astral): 18 amostras reais de D2 a B6 (tonejs-instruments, CC-BY 3.0),
+ * cobrindo toda a extensão da cifra v2 (A2–E6) sem necessidade de transposição de oitava.
  */
-export function toImposingCelloRegister(noteName: string): {
-  mainNote: string;
-  subBassNote: string | null;
-} {
-  const midi = Note.midi(noteName);
-  if (midi == null) return { mainNote: noteName, subBassNote: null };
-
-  const useSharps = noteName.includes("#");
-  let targetMidi = midi;
-  while (targetMidi >= 60) {
-    // >= C4 desce para C3–B3 (ou C2–B3)
-    targetMidi -= 12;
-  }
-  while (targetMidi < 36) {
-    // >= C2
-    targetMidi += 12;
-  }
-
-  const formatNote = (m: number) =>
-    (useSharps ? Note.fromMidiSharps(m) : Note.fromMidi(m)) || noteName;
-
-  const mainNote = formatNote(targetMidi);
-  // Camada sub-oitava sutil apenas se permanecer dentro do registro real >= C2 (MIDI 36)
-  const subMidi = targetMidi - 12;
-  const subBassNote = subMidi >= 36 ? formatNote(subMidi) : null;
-
-  return { mainNote, subBassNote };
-}
+const HARP_BASE_URL = "./samples/harp/";
+const HARP_SAMPLE_URLS: Record<string, string> = {
+  D2: "D2.mp3",
+  F2: "F2.mp3",
+  A2: "A2.mp3",
+  C3: "C3.mp3",
+  E3: "E3.mp3",
+  G3: "G3.mp3",
+  B3: "B3.mp3",
+  D4: "D4.mp3",
+  F4: "F4.mp3",
+  A4: "A4.mp3",
+  C5: "C5.mp3",
+  E5: "E5.mp3",
+  G5: "G5.mp3",
+  B5: "B5.mp3",
+  D6: "D6.mp3",
+  F6: "F6.mp3",
+  A6: "A6.mp3",
+  B6: "B6.mp3",
+};
 
 export interface PlaybackTickState {
   isPlaying: boolean;
@@ -108,10 +66,10 @@ export interface PlaybackTickState {
 
 class CartierAudioEngine {
   private pianoSampler: Tone.Sampler | null = null;
-  private celloSampler: Tone.Sampler | null = null;
+  private harpSampler: Tone.Sampler | null = null;
   private pianoFilter: Tone.Filter | null = null;
-  private celloFilter: Tone.Filter | null = null;
-  private celloEq: Tone.EQ3 | null = null;
+  private harpEq: Tone.EQ3 | null = null;
+  private harpDelay: Tone.FeedbackDelay | null = null;
   private masterReverb: Tone.Reverb | null = null;
   private masterDelay: Tone.FeedbackDelay | null = null;
   private masterCompressor: Tone.Compressor | null = null;
@@ -135,10 +93,10 @@ class CartierAudioEngine {
     this.initializingPromise = (async () => {
       await Tone.start();
 
-      // Aquece o cache local dos 45 arquivos de samples com progresso real (0–85%)
+      // Aquece o cache local dos 33 arquivos de samples (15 piano + 18 harpa)
       const urlsToWarm = [
         ...Object.values(PIANO_SAMPLE_URLS).map((f) => `./samples/piano/${f}`),
-        ...Object.values(CELLO_SAMPLE_URLS).map((f) => `./samples/cello/${f}`),
+        ...Object.values(HARP_SAMPLE_URLS).map((f) => `${HARP_BASE_URL}${f}`),
       ];
       let loadedCount = 0;
       const totalFiles = urlsToWarm.length;
@@ -161,7 +119,7 @@ class CartierAudioEngine {
       this.masterCompressor = new Tone.Compressor({
         threshold: -16,
         ratio: 3,
-        attack: 0.02,
+        attack: 0.015,
         release: 0.25,
       });
       this.masterDelay = new Tone.FeedbackDelay({
@@ -170,7 +128,7 @@ class CartierAudioEngine {
         wet: 0.1,
       });
       this.masterReverb = new Tone.Reverb({
-        decay: 3.4,
+        decay: 3.6,
         preDelay: 0.02,
         wet: this.reverbWet,
       });
@@ -181,7 +139,7 @@ class CartierAudioEngine {
         Tone.getDestination()
       );
 
-      // Piano mantém delay etéreo sutil antes do reverb
+      // Piano Lunar: filtro ajustável + delay etéreo sutil
       this.pianoFilter = new Tone.Filter({
         frequency: 4200,
         type: "lowpass",
@@ -189,21 +147,21 @@ class CartierAudioEngine {
       });
       this.pianoFilter.chain(this.masterDelay, this.masterReverb);
 
-      // Violoncelo: sem Chorus e sem Delay para evitar som de órgão;
-      // EQ3 dedicado dá corpo de madeira grave e atrito natural de arco
-      this.celloEq = new Tone.EQ3({
-        low: 5,
-        mid: 2,
-        high: -4,
-        lowFrequency: 180,
-        highFrequency: 2500,
+      // Harpa Astral Solar: EQ acústico valorizando caixa de madeira (220 Hz) e brilho de cordas (4.2 kHz)
+      // com delay cristalino dedicado que realça arpejos e glissandos
+      this.harpEq = new Tone.EQ3({
+        low: 2.5,
+        mid: 0.5,
+        high: 2,
+        lowFrequency: 220,
+        highFrequency: 4200,
       });
-      this.celloFilter = new Tone.Filter({
-        frequency: 2800,
-        type: "lowpass",
-        rolloff: -12,
+      this.harpDelay = new Tone.FeedbackDelay({
+        delayTime: "8n.",
+        feedback: 0.16,
+        wet: 0.15,
       });
-      this.celloEq.chain(this.celloFilter, this.masterReverb);
+      this.harpEq.chain(this.harpDelay, this.masterReverb);
 
       this.pianoSampler = new Tone.Sampler({
         urls: PIANO_SAMPLE_URLS,
@@ -211,12 +169,12 @@ class CartierAudioEngine {
         baseUrl: "./samples/piano/",
       }).connect(this.pianoFilter);
 
-      this.celloSampler = new Tone.Sampler({
-        urls: CELLO_SAMPLE_URLS,
-        attack: 0.05,
-        release: 1.8,
-        baseUrl: "./samples/cello/",
-      }).connect(this.celloEq);
+      this.harpSampler = new Tone.Sampler({
+        urls: HARP_SAMPLE_URLS,
+        attack: 0,
+        release: 1.9,
+        baseUrl: HARP_BASE_URL,
+      }).connect(this.harpEq);
 
       await Tone.loaded();
       this.applyDestinationVolume();
@@ -255,7 +213,10 @@ class CartierAudioEngine {
         dest.mute = true;
       } else {
         dest.mute = false;
-        const normalized = Math.max(0.001, Math.min(1, this.volumePercent / 100));
+        const normalized = Math.max(
+          0.001,
+          Math.min(1, this.volumePercent / 100)
+        );
         dest.volume.value = Tone.gainToDb(Math.pow(normalized, 1.35));
       }
     } catch {
@@ -279,21 +240,12 @@ class CartierAudioEngine {
     noteName: string,
     durationSeconds: number,
     time: number,
-    velocity: number,
-    isMelody: boolean
+    velocity: number
   ) {
-    if (voice === "cello") {
-      const { mainNote, subBassNote } = toImposingCelloRegister(noteName);
-      const bowDuration = Math.max(0.75, durationSeconds * 1.35);
-      sampler.triggerAttackRelease(mainNote, bowDuration, time, velocity);
-      if (isMelody && subBassNote) {
-        sampler.triggerAttackRelease(
-          subBassNote,
-          bowDuration,
-          time,
-          Math.min(0.32, velocity * 0.36)
-        );
-      }
+    if (voice === "harp") {
+      // Corda pinçada: mantém ressonância natural leve sem precisar esticar nem dobrar
+      const harpDur = Math.max(0.28, durationSeconds * 1.45);
+      sampler.triggerAttackRelease(noteName, harpDur, time, velocity);
       return;
     }
 
@@ -312,7 +264,7 @@ class CartierAudioEngine {
     velocity = 0.82
   ) {
     if (!this.initialized || this.muted || this.volumePercent <= 0) return;
-    const sampler = voice === "cello" ? this.celloSampler : this.pianoSampler;
+    const sampler = voice === "harp" ? this.harpSampler : this.pianoSampler;
     if (!sampler) return;
     try {
       this.triggerInstrumentNote(
@@ -321,12 +273,78 @@ class CartierAudioEngine {
         soundingNote,
         durationSeconds,
         Tone.now(),
-        velocity,
-        true
+        velocity
       );
     } catch {
       // ignora se nota inválida
     }
+  }
+
+  /**
+   * Dispara um glissando celestial de harpa na tonalidade ativa (Lá Menor Lunar ou Lá Maior Solar).
+   */
+  playHarpGlissando(mode: MusicalMode) {
+    if (
+      !this.initialized ||
+      !this.harpSampler ||
+      this.muted ||
+      this.volumePercent <= 0
+    ) {
+      return;
+    }
+    const scale =
+      mode === "sol"
+        ? [
+            "A2",
+            "B2",
+            "C#3",
+            "D3",
+            "E3",
+            "F#3",
+            "G#3",
+            "A3",
+            "B3",
+            "C#4",
+            "D4",
+            "E4",
+            "F#4",
+            "G#4",
+            "A4",
+            "C#5",
+            "E5",
+            "A5",
+          ]
+        : [
+            "A2",
+            "B2",
+            "C3",
+            "D3",
+            "E3",
+            "F3",
+            "G3",
+            "A3",
+            "B3",
+            "C4",
+            "D4",
+            "E4",
+            "F4",
+            "G4",
+            "A4",
+            "C5",
+            "E5",
+            "A5",
+          ];
+
+    const start = Tone.now() + 0.02;
+    scale.forEach((note, idx) => {
+      const t = start + idx * 0.038;
+      const vel = Math.min(0.85, 0.42 + idx * 0.022);
+      try {
+        this.harpSampler?.triggerAttackRelease(note, 1.4, t, vel);
+      } catch {
+        // ignora falha pontual
+      }
+    });
   }
 
   private getAnalyserEnergy(): number {
@@ -366,7 +384,7 @@ class CartierAudioEngine {
     timeline.allEvents.forEach((ev: ScheduledPlaybackEvent) => {
       if (!ev.soundingNote) return;
       const sampler =
-        ev.voice === "cello" ? this.celloSampler : this.pianoSampler;
+        ev.voice === "harp" ? this.harpSampler : this.pianoSampler;
       if (!sampler) return;
 
       transport.schedule((time) => {
@@ -378,8 +396,7 @@ class CartierAudioEngine {
               ev.soundingNote,
               ev.durationSeconds,
               time,
-              ev.velocity,
-              ev.isMelody
+              ev.velocity
             );
           } catch {
             // ignora falha pontual
@@ -468,7 +485,7 @@ class CartierAudioEngine {
     }
     try {
       this.pianoSampler?.releaseAll();
-      this.celloSampler?.releaseAll();
+      this.harpSampler?.releaseAll();
     } catch {
       // ignora
     }

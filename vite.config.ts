@@ -16,7 +16,7 @@ export default defineConfig({
               "background.svg",
               "icon.svg",
               "samples/piano/*.mp3",
-              "samples/cello/*.mp3",
+              "samples/harp/*.mp3",
             ],
             manifest: {
               name: "Código Cartier — Symphonic Edition",

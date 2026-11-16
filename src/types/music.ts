@@ -4,7 +4,7 @@ export type SunMoonMode = "lua" | "sol" | "eclipse";
 
 export type MusicalMode = "lua" | "sol";
 
-export type InstrumentVoice = "piano" | "cello";
+export type InstrumentVoice = "piano" | "harp";
 
 export type OrchestrationMode = "solo" | "noturno" | "sinfonia";
 
